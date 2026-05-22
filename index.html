@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fábrica de Productos Digitales — Sistema Multi-Agente</title>
+  <meta name="description" content="De un nicho a un producto digital listo para vender, automatizado con IA.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏭</text></svg>">
+</head>
+<body>
+  <div class="shell" id="app">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="logo">
+        <div class="logo-mark">FP</div>
+        <div class="logo-text">Fábrica de <span>Productos</span></div>
+      </div>
+      <div class="topbar-center">
+        <div class="pipeline-mini" id="pipelineMini"></div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill" id="statusPill">
+          <div class="pulse-dot"></div>
+          <span id="statusText">LISTO</span>
+        </div>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">CONFIGURACIÓN</div>
+        <div class="sidebar-item active" data-view="main">
+          <span class="sidebar-icon">⚡</span>
+          <span class="sidebar-text">Generador</span>
+        </div>
+        <div class="sidebar-item" data-view="sessions">
+          <span class="sidebar-icon">📁</span>
+          <span class="sidebar-text">Sesiones</span>
+        </div>
+        <div class="sidebar-item" data-view="settings">
+          <span class="sidebar-icon">⚙️</span>
+          <span class="sidebar-text">Ajustes</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">PIPELINE</div>
+        <div id="sidebarSteps"></div>
+      </div>
+
+      <div class="sidebar-section sidebar-stats" id="sidebarStats" style="display:none">
+        <div class="sidebar-label">MÉTRICAS</div>
+        <div class="stat-item"><span class="stat-label">Tokens In</span><span class="stat-value" id="statTokensIn">0</span></div>
+        <div class="stat-item"><span class="stat-label">Tokens Out</span><span class="stat-value" id="statTokensOut">0</span></div>
+        <div class="stat-item"><span class="stat-label">Costo</span><span class="stat-value" id="statCost">$0.000</span></div>
+        <div class="stat-item"><span class="stat-label">Llamadas</span><span class="stat-value" id="statCalls">0</span></div>
+        <div class="stat-item"><span class="stat-label">Continuaciones</span><span class="stat-value" id="statCont">0</span></div>
+        <div class="stat-item"><span class="stat-label">QA Fixes</span><span class="stat-value" id="statQA">0</span></div>
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main" id="mainContent">
+      <!-- VIEW: MAIN (GENERADOR) -->
+      <div id="viewMain" class="view-content active">
+        <!-- TABS -->
+        <div class="tabs-header" id="mainTabs">
+          <button class="tab-btn active" data-tab="tabConcepto">1. Estrategia & Copy</button>
+          <button class="tab-btn" data-tab="tabProduccion" id="btnTabProduccion" disabled>2. Production Studio</button>
+        </div>
+
+        <!-- TAB 1: CONCEPTO -->
+        <div id="tabConcepto" class="tab-content active">
+          <!-- API & Provider Section -->
+          <div class="api-section" id="apiSection">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <label class="api-label">🔑 API Key</label>
+              <div class="provider-select" id="providerSelect">
+                <button class="provider-option active" data-provider="anthropic">Claude</button>
+                <button class="provider-option" data-provider="gemini">Gemini</button>
+              </div>
+            </div>
+            <input type="password" id="apiKey" class="input" placeholder="sk-ant-api03-... o AIza..." autocomplete="off" />
+            <p class="api-hint" id="apiHint">Obtené tu key en <a href="https://console.anthropic.com/keys" target="_blank" id="apiLink">console.anthropic.com/keys</a></p>
+          </div>
+
+          <!-- Niche Input -->
+          <div class="input-row" style="margin-top:20px; display:flex; gap:12px;">
+            <input type="text" id="nicheInput" class="input niche-input" placeholder="ej: productividad para freelancers latinoamericanos..." style="flex:1;" />
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button id="btnRun" class="btn-primary" onclick="window.__startAgent()">
+                <span class="btn-icon">▶</span> RUN
+              </button>
+              <button id="btnResume" class="btn-ghost btn-sm" onclick="window.__runEnglishOnly()" style="font-size:11px; margin:0; padding:4px 8px;" title="Retomar generación saltando a la parte en inglés si ya tienes el español">
+                ⏩ Reanudar Inglés
+              </button>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress-wrap" id="progressWrap" style="display:none; margin-top:20px;">
+            <div class="progress-info">
+              <span id="progressLabel">Iniciando...</span>
+              <span id="progressPct">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+
+          <!-- Done Banner -->
+          <div class="done-banner" id="doneBanner" style="display:none; margin-top:20px;">
+            <div>
+              <p style="font-size:13px;color:var(--accent-success);font-weight:700">🎉 Estrategia completada</p>
+              <span style="font-size:10px;color:var(--text-muted)">Continuá a Production Studio para generar archivos.</span>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn-primary btn-sm" id="btnGoToStudio" style="font-size:11px;">Ir al Studio →</button>
+            </div>
+          </div>
+
+          <!-- Error Box -->
+          <div class="error-box" id="errorBox" style="display:none; margin-top:20px;"></div>
+
+          <!-- Steps List -->
+          <div class="steps-list" id="stepsList" style="margin-top:20px;"></div>
+
+          <!-- Log Panel -->
+          <div class="log-panel" id="logPanel" style="display:none; margin-top:20px;">
+            <div class="log-header">
+              <span style="font-size:11px;font-weight:600;color:var(--text-secondary)">ORCHESTRATOR LOG</span>
+              <button class="btn-ghost btn-sm" id="btnClearLog">Limpiar</button>
+            </div>
+            <div class="log-body" id="logBody"></div>
+          </div>
+
+          <!-- Reset -->
+          <button class="btn-ghost" id="resetBtn" style="display:none;width:100%;margin-top:12px;font-size:11px;color:var(--text-muted)" onclick="window.__resetAll()">↩ Empezar con otro nicho</button>
+        </div>
+
+        <!-- TAB 2: PRODUCTION STUDIO -->
+        <div id="tabProduccion" class="tab-content" style="display:none;">
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <h2 style="font-size:14px; margin:0;">🤖 Agente 2: Production Studio</h2>
+            </div>
+            <div class="card-body">
+              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+                Este agente lee el outline de tu curso y genera los entregables listos para usar (PDF, Notion).
+              </p>
+              <button class="btn-primary" id="btnBuildEbook">Generar eBook Profesional (PDF)</button>
+              <button class="btn-secondary" id="btnBuildNotion">Exportar Plantilla Notion (.md)</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <h2 style="font-size:14px; margin:0;">🚀 Agente 3: Launch Manager</h2>
+            </div>
+            <div class="card-body">
+              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+                Genera tu página de ventas (Landing Page) en HTML/CSS lista para subir a tu servidor o plataforma.
+              </p>
+              <button class="btn-success" id="btnBuildSalesPage">Generar Sales Page (ZIP)</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom: 20px; border: 1px solid rgba(245, 158, 11, 0.25); background: rgba(245, 158, 11, 0.02);">
+            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size:16px;">👑</span>
+              <h2 style="font-size:14px; margin:0; color: var(--accent-primary);">Master Kit: Exportar Todo el Proyecto</h2>
+            </div>
+            <div class="card-body">
+              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+                Descarga todo el material generado por la fábrica (ebook, notion, landing page, branding, posts, videos y escala) en un solo archivo estructurado.
+              </p>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn-primary" id="btnBuildMasterZip" style="background: linear-gradient(135deg, var(--accent-primary) 0%, #d97706 100%); border:none; color:black; font-weight:700;">📦 Descargar Master ZIP Kit</button>
+                <button class="btn-secondary" id="btnDlAllMd">📄 Todo en un Markdown (.md)</button>
+                <button class="btn-secondary" id="btnDlAllJson">💾 Respaldo de Datos (.json)</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="studioPreviewArea" style="display:none;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+              <h3 style="font-size:13px; color:var(--text-primary);">Vista Previa (PDF)</h3>
+              <button class="btn-success btn-sm" id="btnDownloadPdf">Descargar PDF Final</button>
+            </div>
+            <div id="pdfContainer" style="background:white; color:black; padding:40px; border-radius:8px; max-height:600px; overflow-y:auto; box-shadow:var(--shadow-lg);">
+              <!-- PDF content will be injected here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: SESSIONS -->
+      <div id="viewSessions" class="view-content" style="display:none;">
+        <div class="card">
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="font-size:14px; margin:0;">📁 Historial de Sesiones</h2>
+            <button class="btn-ghost btn-sm" id="btnRefreshSessions">🔄 Actualizar</button>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
+                <thead style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle);">
+                  <tr>
+                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Fecha</th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Nicho / Producto</th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Pasos</th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Estado</th>
+                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary); text-align: right;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="sessionsTableBody">
+                  <tr>
+                    <td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">
+                      Cargando sesiones...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: SETTINGS -->
+      <div id="viewSettings" class="view-content" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <h2 style="font-size:14px; margin:0;">⚙️ Ajustes de la Fábrica</h2>
+          </div>
+          <div class="card-body">
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+              Opciones globales y preferencias de los agentes. En construcción.
+            </p>
+            <div class="api-section" style="margin-top: 10px;">
+              <label class="api-label">Idioma Principal de Salida (WIP)</label>
+              <div class="provider-select" style="margin-top: 10px; display: inline-flex;">
+                <button class="provider-option active">LatAm</button>
+                <button class="provider-option">Global</button>
+                <button class="provider-option">Dual</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p style="text-align:center;font-size:10px;color:var(--text-disabled);margin-top:20px;">
+        Fábrica de Productos Digitales v2.0 · Local Multi-Agent Architecture
+      </p>
+    </main>
+  </div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
