@@ -52,20 +52,51 @@ export const PROVIDERS = {
   GEMINI: 'gemini'
 };
 
+// ─── Model Catalog (api-design-best-practices) ──────────────────────────
+export const MODEL_CATALOG = {
+  anthropic: [
+    { id: 'claude-haiku-4-5-20251001', label: 'Claude 4.5 Haiku', speed: 'fast', inputCostPer1M: 0.80, outputCostPer1M: 4.00 },
+    { id: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4', speed: 'balanced', inputCostPer1M: 3.00, outputCostPer1M: 15.00 },
+    { id: 'claude-opus-4-20250514', label: 'Claude Opus 4', speed: 'powerful', inputCostPer1M: 15.00, outputCostPer1M: 75.00 },
+  ],
+  gemini: [
+    { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', speed: 'fast', inputCostPer1M: 0.15, outputCostPer1M: 0.60 },
+    { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', speed: 'powerful', inputCostPer1M: 1.25, outputCostPer1M: 10.00 },
+  ],
+};
+
+export const TONE_PRESETS = [
+  { id: 'casual-latam', label: '🌎 Casual LatAm', desc: 'Cálido, cercano, empático' },
+  { id: 'formal', label: '🎩 Formal', desc: 'Profesional y corporativo' },
+  { id: 'aggressive-sales', label: '🔥 Ventas Agresivas', desc: 'Copy directo, urgencia y escasez' },
+  { id: 'academic', label: '📚 Académico', desc: 'Técnico, datos duros, serio' },
+  { id: 'storytelling', label: '📖 Storytelling', desc: 'Narrativo, emocional, historias' },
+];
+
+export const PROVIDERS = {
+  ANTHROPIC: 'anthropic',
+  GEMINI: 'gemini'
+};
+
+export const AVAILABLE_MODELS = {
+  anthropic: [
+    { id: 'claude-haiku-4-5-20251001', name: 'Claude 3.5 Haiku', input: 0.80, output: 4.00, tokens: 8000 },
+    { id: 'claude-sonnet-4-20250514', name: 'Claude 3.5 Sonnet', input: 3.00, output: 15.00, tokens: 8192 },
+    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet (Legacy)', input: 3.00, output: 15.00, tokens: 8192 }
+  ],
+  gemini: [
+    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', input: 0.15, output: 0.60, tokens: 8192 },
+    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', input: 0.15, output: 0.60, tokens: 8192 },
+    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', input: 1.25, output: 5.00, tokens: 8192 }
+  ]
+};
+
 export const MODEL_CONFIG = {
   anthropic: {
-    model: 'claude-haiku-4-5-20251001',
-    maxTokens: 8000,
     endpoint: 'https://api.anthropic.com/v1/messages',
-    inputCostPer1M: 0.80,
-    outputCostPer1M: 4.00,
   },
   gemini: {
-    model: 'gemini-2.5-flash',
-    maxTokens: 8192,
     endpoint: 'https://generativelanguage.googleapis.com/v1beta/models',
-    inputCostPer1M: 0.15,
-    outputCostPer1M: 0.60,
   }
 };
 

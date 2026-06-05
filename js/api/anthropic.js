@@ -1,4 +1,6 @@
 import { MODEL_CONFIG } from '../config.js';
+import { fetchWithRetry } from './retry.js';
+import { getActiveModel } from '../utils/settings.js';
 
 /**
  * Call Anthropic Claude API
@@ -10,7 +12,9 @@ import { MODEL_CONFIG } from '../config.js';
  */
 export async function callAnthropic(prompt, systemPrompt, apiKey, maxTokens = 8000) {
   const config = MODEL_CONFIG.anthropic;
-  const response = await fetch(config.endpoint, {
+  const activeModelId = getActiveModel('anthropic');
+  
+  const response = await fetchWithRetry(config.endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -19,7 +23,7 @@ export async function callAnthropic(prompt, systemPrompt, apiKey, maxTokens = 80
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: config.model,
+      model: activeModelId,
       max_tokens: maxTokens,
       system: systemPrompt,
       messages: [{ role: 'user', content: prompt }]

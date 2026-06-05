@@ -2,6 +2,7 @@ import { loadSession as getSession, getLatestSessionId } from '../utils/session.
 import { studio } from '../agents/production-studio.js';
 import { launchManager } from '../agents/launch-manager.js';
 import { downloadFile as downloadString, downloadAllMd, downloadAllJson } from '../utils/download.js';
+import { toast } from './toast.js';
 
 export class StudioPanel {
   constructor(appRef) {
@@ -57,7 +58,7 @@ export class StudioPanel {
     if (tabId === 'tabProduccion') {
       const sessionId = getLatestSessionId();
       if (!sessionId) {
-        alert('No hay una sesión completa para pasar al Studio.');
+        toast.warning('No hay una sesión completa para pasar al Studio.');
         return;
       }
       this.tabProduccionBtn.removeAttribute('disabled');
@@ -91,7 +92,7 @@ export class StudioPanel {
       this.pdfContainer.innerHTML = this.currentHtmlPdf;
       this.studioPreviewArea.style.display = 'block';
     } catch (e) {
-      alert('Error renderizando HTML: ' + e.message);
+      toast.error('Error renderizando HTML: ' + e.message);
     } finally {
       this.btnBuildEbook.innerHTML = 'Generar eBook Profesional (PDF)';
       this.btnBuildEbook.disabled = false;
@@ -108,6 +109,7 @@ export class StudioPanel {
     const markdown = studio.generateNotionMarkdown(session);
     const slug = (session.productName || 'notion-template').toLowerCase().replace(/[^a-z0-9]+/g, '-');
     downloadString(markdown, 'text/markdown', `${slug}-notion.md`);
+    toast.success('Plantilla de Notion descargada');
   }
 
   downloadSalesPage() {
@@ -121,7 +123,8 @@ export class StudioPanel {
     this.btnBuildSalesPage.disabled = true;
     
     launchManager.generateSalesPageZip(session)
-      .catch(e => alert('Error generando página de ventas: ' + e.message))
+      .then(() => toast.success('Sales Page descargada con éxito 🚀'))
+      .catch(e => toast.error('Error generando página de ventas: ' + e.message))
       .finally(() => {
         this.btnBuildSalesPage.innerHTML = 'Generar Sales Page (ZIP)';
         this.btnBuildSalesPage.disabled = false;
@@ -140,8 +143,9 @@ export class StudioPanel {
     
     try {
       await studio.downloadPdf(this.currentHtmlPdf, slug);
+      toast.success('PDF exportado correctamente');
     } catch (e) {
-      alert('Error descargando PDF: ' + e.message);
+      toast.error('Error descargando PDF: ' + e.message);
     } finally {
       this.btnDownloadPdf.innerText = 'Descargar PDF Final';
       this.btnDownloadPdf.disabled = false;
@@ -159,7 +163,8 @@ export class StudioPanel {
     this.btnBuildMasterZip.disabled = true;
     
     launchManager.generateMasterZip(session)
-      .catch(e => alert('Error generando Master ZIP: ' + e.message))
+      .then(() => toast.success('Master ZIP Kit exportado con éxito 👑'))
+      .catch(e => toast.error('Error generando Master ZIP: ' + e.message))
       .finally(() => {
         this.btnBuildMasterZip.innerHTML = '📦 Descargar Master ZIP Kit';
         this.btnBuildMasterZip.disabled = false;

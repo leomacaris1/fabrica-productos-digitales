@@ -1,5 +1,6 @@
 import { callLLM } from '../api/providers.js';
 import { SYSTEM_PROMPTS } from '../config.js';
+import { getEffectiveSystemPrompt } from '../utils/settings.js';
 
 /**
  * Writer Agent - generates content from prompts
@@ -14,7 +15,7 @@ import { SYSTEM_PROMPTS } from '../config.js';
 export async function writerGenerate({ prompt, apiKey, provider, language = 'es-latam', maxTokens }) {
   return callLLM({
     prompt,
-    systemPrompt: SYSTEM_PROMPTS[language] || SYSTEM_PROMPTS['es-latam'],
+    systemPrompt: getEffectiveSystemPrompt(language, SYSTEM_PROMPTS),
     apiKey,
     provider,
     maxTokens,

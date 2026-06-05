@@ -1,5 +1,6 @@
 import { callLLM } from '../api/providers.js';
 import { QA_SYSTEM_PROMPTS } from '../config.js';
+import { getEffectiveQAPrompt } from '../utils/settings.js';
 
 /**
  * QA Agent - reviews content for completeness
@@ -31,7 +32,7 @@ ${content}
 
   const result = await callLLM({
     prompt,
-    systemPrompt: QA_SYSTEM_PROMPTS[language] || QA_SYSTEM_PROMPTS['es-latam'],
+    systemPrompt: getEffectiveQAPrompt(language, QA_SYSTEM_PROMPTS),
     apiKey,
     provider,
     maxTokens: 8000,

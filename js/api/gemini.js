@@ -1,4 +1,6 @@
 import { MODEL_CONFIG } from '../config.js';
+import { fetchWithRetry } from './retry.js';
+import { getActiveModel } from '../utils/settings.js';
 
 /**
  * Call Google Gemini API
@@ -10,9 +12,10 @@ import { MODEL_CONFIG } from '../config.js';
  */
 export async function callGemini(prompt, systemPrompt, apiKey, maxTokens = 8192) {
   const config = MODEL_CONFIG.gemini;
-  const url = `${config.endpoint}/${config.model}:generateContent?key=${apiKey}`;
+  const activeModelId = getActiveModel('gemini');
+  const url = `${config.endpoint}/${activeModelId}:generateContent?key=${apiKey}`;
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

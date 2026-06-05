@@ -428,6 +428,35 @@ export class LaunchManager {
     const zip = new JSZip();
     const slug = (productName || niche).toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
+    // Create README.md
+    const readmeContent = `# ${productName || 'Proyecto Generado'}
+## Master Kit de la Fábrica de Productos Digitales
+
+Este archivo ZIP contiene todos los materiales y recursos de tu producto digital.
+
+### Estructura del ZIP:
+- **00_DOCUMENTO_MAESTRO_COMPLETO.md**: Un solo archivo con toda la info.
+- **01_Estrategia_y_Nicho**: Investigación de mercado e ideas.
+- **02_Ebook_y_Academia**: El producto en sí (HTML, MD) y plantilla Notion.
+- **03_Branding_y_Posicionamiento**: Tono de marca y spin-offs.
+- **04_Pagina_de_Ventas**: Landing page lista en HTML/CSS.
+- **05_Marketing_y_Redes**: Posts, correos y guiones promocionales.
+- **06_Escala_e_IA**: Prompts y contexto de escala para seguir operando.
+- **backup_datos_proyecto.json**: Archivo técnico para importar de vuelta.
+
+¡Éxitos con tu lanzamiento! 🚀`;
+    zip.file('README.md', readmeContent);
+
+    // Create MANIFEST.json
+    const manifestJson = JSON.stringify({
+      version: "3.0",
+      project_name: productName || niche,
+      generated_at: new Date().toISOString(),
+      generator: "Fábrica de Productos Digitales v3.0",
+      stats: sessionData.stats || {}
+    }, null, 2);
+    zip.file('MANIFEST.json', manifestJson);
+
     if (sessionData.isDual) {
       // Dual generation zip
       const folderEs = zip.folder('ES_LatAm');

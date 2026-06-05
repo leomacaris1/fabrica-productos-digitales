@@ -15,6 +15,9 @@ import { addLog, clearLog } from './ui/log-panel.js';
 import { updateProgress, showProgress, hideProgress } from './ui/progress.js';
 import { updateStats } from './ui/stats-bar.js';
 import { StudioPanel } from './ui/studio-panel.js';
+import { toast } from './ui/toast.js';
+import { loadSettings, saveSettings, getTheme, toggleTheme } from './utils/settings.js';
+import { AVAILABLE_MODELS } from './config.js';
 
 // ─── State ───────────────────────────────────────────────────────────────
 let currentProvider = PROVIDERS.ANTHROPIC;
@@ -149,16 +152,16 @@ async function startAgent() {
   const niche = $('nicheInput').value.trim();
   const apiKey = $('apiKey').value.trim();
 
-  if (!niche) { alert('Ingresá un nicho'); return; }
-  if (!apiKey) { alert('Ingresá tu API key'); return; }
+  if (!niche) { toast.warning('Ingresá un nicho'); return; }
+  if (!apiKey) { toast.warning('Ingresá tu API key'); return; }
 
   // Validate key format
   if (currentProvider === PROVIDERS.ANTHROPIC && !apiKey.startsWith('sk-')) {
-    alert('La API key de Anthropic debe empezar con sk-');
+    toast.error('La API key de Anthropic debe empezar con sk-');
     return;
   }
   if (currentProvider === PROVIDERS.GEMINI && !apiKey.startsWith('AIza')) {
-    alert('La API key de Gemini debe empezar con AIza');
+    toast.error('La API key de Gemini debe empezar con AIza');
     return;
   }
 
@@ -282,12 +285,12 @@ function handleDownloadJson() {
 async function runEnglishOnly() {
   const latestId = getLatestSessionId();
   if (!latestId) {
-    alert("No se encontró una sesión en progreso para continuar.");
+    toast.error("No se encontró una sesión en progreso para continuar.");
     return;
   }
   const sessionEs = loadSession(latestId);
   if (!sessionEs || !sessionEs.results) {
-    alert("La sesión anterior está incompleta o corrupta.");
+    toast.error("La sesión anterior está incompleta o corrupta.");
     return;
   }
 
@@ -295,7 +298,7 @@ async function runEnglishOnly() {
   sessionId = latestId;
   const niche = sessionEs.niche;
   const apiKey = $('apiKey').value.trim();
-  if (!apiKey) { alert('Por favor, reingresá tu API key para continuar'); return; }
+  if (!apiKey) { toast.warning('Por favor, reingresá tu API key para continuar'); return; }
 
   isRunning = true;
   results = {}; // empty pipeline visual
@@ -377,7 +380,7 @@ function loadSessionData(id) {
   
   // Go to main view
   document.querySelector('.sidebar-item[data-view="main"]').click();
-  alert('Sesión cargada. Recuerda reingresar tu API Key para continuar si no ha terminado.');
+  toast.success('Sesión cargada. Recuerda reingresar tu API Key para continuar si no ha terminado.');
 }
 
 function deleteSessionData(id) {
@@ -397,11 +400,84 @@ window.__downloadStep = (stepId) => {
   if (results[stepId]) {
     const step = STEPS.find(s => s.id === stepId);
     downloadStep(stepId, results[stepId], step.title);
+    toast.success(`Descargando paso ${stepId}...`);
   }
 };
 
+// ─── Settings Logic ──────────────────────────────────────────────────────
+function initSettingsUI() {
+  // Populate Models
+  const selectAnthropic = $('settingModelAnthropic');
+  const selectGemini = $('settingModelGemini');
+  if (selectAnthropic) {
+    selectAnthropic.innerHTML = AVAILABLE_MODELS.anthropic.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  }
+  if (selectGemini) {
+    selectGemini.innerHTML = AVAILABLE_MODELS.gemini.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  }
+
+  // Tone Buttons
+  const toneButtons = document.querySelectorAll('#settingToneSelect .provider-option');
+  toneButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toneButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Save Button
+  $('btnSaveSettings')?.addEventListener('click', () => {
+    const activeToneBtn = document.querySelector('#settingToneSelect .provider-option.active');
+    
+    saveSettings({
+      model: {
+        anthropic: $('settingModelAnthropic')?.value,
+        gemini: $('settingModelGemini')?.value
+      },
+      tone: activeToneBtn?.dataset.tone || 'profesional',
+      customSystemPrompt: {
+        'es-latam': $('settingPromptLatam')?.value || null,
+        'en-us': $('settingPromptUs')?.value || null
+      }
+    });
+    
+    toast.success('Ajustes guardados correctamente');
+  });
+  
+  loadSettingsToUI();
+}
+
+function loadSettingsToUI() {
+  const s = loadSettings();
+  
+  // Theme
+  document.documentElement.dataset.theme = s.theme || 'dark';
+
+  // Models
+  if ($('settingModelAnthropic')) $('settingModelAnthropic').value = s.model.anthropic;
+  if ($('settingModelGemini')) $('settingModelGemini').value = s.model.gemini;
+  
+  // Tone
+  const toneButtons = document.querySelectorAll('#settingToneSelect .provider-option');
+  toneButtons.forEach(b => {
+    b.classList.toggle('active', b.dataset.tone === s.tone);
+  });
+  
+  // Prompts
+  if ($('settingPromptLatam')) $('settingPromptLatam').value = s.customSystemPrompt['es-latam'] || '';
+  if ($('settingPromptUs')) $('settingPromptUs').value = s.customSystemPrompt['en-us'] || '';
+}
+
+// ─── Theme Toggle ────────────────────────────────────────────────────────
+function handleThemeToggle() {
+  const newTheme = toggleTheme();
+  document.documentElement.dataset.theme = newTheme;
+  toast.info(newTheme === 'dark' ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado');
+}
+
 // ─── Init ────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  initSettingsUI();
   updateClock();
   initProviderSelect();
   renderStepCards(STEPS);
@@ -412,6 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
   studioPanel = new StudioPanel(window);
 
   // Event listeners
+  $('btnThemeToggle')?.addEventListener('click', handleThemeToggle);
   $('btnDlMd')?.addEventListener('click', handleDownloadMd);
   $('btnDlJson')?.addEventListener('click', handleDownloadJson);
   $('btnClearLog')?.addEventListener('click', clearLog);

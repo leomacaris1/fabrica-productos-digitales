@@ -1,6 +1,7 @@
-import { PROVIDERS, MODEL_CONFIG } from '../config.js';
+import { PROVIDERS, AVAILABLE_MODELS } from '../config.js';
 import { callAnthropic } from './anthropic.js';
 import { callGemini } from './gemini.js';
+import { getActiveModel } from '../utils/settings.js';
 
 /**
  * Unified LLM call - routes to the correct provider
@@ -13,14 +14,12 @@ import { callGemini } from './gemini.js';
  * @returns {Promise<{text: string, inputTokens: number, outputTokens: number}>}
  */
 export async function callLLM({ prompt, systemPrompt, apiKey, provider, maxTokens }) {
-  const config = MODEL_CONFIG[provider];
-  const tokens = maxTokens || config.maxTokens;
-
+  // Let the underlying providers handle dynamic models
   switch (provider) {
     case PROVIDERS.ANTHROPIC:
-      return callAnthropic(prompt, systemPrompt, apiKey, tokens);
+      return callAnthropic(prompt, systemPrompt, apiKey, maxTokens);
     case PROVIDERS.GEMINI:
-      return callGemini(prompt, systemPrompt, apiKey, tokens);
+      return callGemini(prompt, systemPrompt, apiKey, maxTokens);
     default:
       throw new Error(`Provider desconocido: ${provider}`);
   }
@@ -34,7 +33,12 @@ export async function callLLM({ prompt, systemPrompt, apiKey, provider, maxToken
  * @returns {number} Cost in USD
  */
 export function calculateCost(provider, inputTokens, outputTokens) {
-  const config = MODEL_CONFIG[provider];
-  return (inputTokens * config.inputCostPer1M / 1_000_000) +
-         (outputTokens * config.outputCostPer1M / 1_000_000);
+  const activeModelId = getActiveModel(provider);
+  const models = AVAILABLE_MODELS[provider] || [];
+  const modelConfig = models.find(m => m.id === activeModelId) || models[0];
+  
+  if (!modelConfig) return 0;
+  
+  return (inputTokens * modelConfig.input / 1_000_000) +
+         (outputTokens * modelConfig.output / 1_000_000);
 }

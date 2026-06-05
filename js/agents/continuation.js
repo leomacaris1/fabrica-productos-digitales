@@ -1,6 +1,7 @@
 import { callLLM } from '../api/providers.js';
 import { SYSTEM_PROMPTS } from '../config.js';
 import { isTruncated } from '../utils/truncation.js';
+import { getEffectiveSystemPrompt } from '../utils/settings.js';
 
 /**
  * Continuation Agent - detects and fixes truncated content
@@ -31,7 +32,7 @@ NO repitas nada del texto anterior. Empieza directo con lo que falta:
 "...${tail}"
 
 Continúa aquí:`,
-      systemPrompt: SYSTEM_PROMPTS[language] || SYSTEM_PROMPTS['es-latam'],
+      systemPrompt: getEffectiveSystemPrompt(language, SYSTEM_PROMPTS),
       apiKey,
       provider,
       maxTokens: 6000,
