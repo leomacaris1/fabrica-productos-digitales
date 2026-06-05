@@ -22,7 +22,7 @@
         <div class="pipeline-mini" id="pipelineMini"></div>
       </div>
       <div class="topbar-right">
-        <button class="btn-ghost btn-sm" id="btnThemeToggle" title="Cambiar Tema" style="margin-right: 10px; font-size: 14px;">🌙</button>
+        <button class="btn-ghost btn-sm u-mr-10 u-fs-14" id="btnThemeToggle" title="Cambiar Tema">🌙</button>
         <div class="status-pill" id="statusPill">
           <div class="pulse-dot"></div>
           <span id="statusText">LISTO</span>
@@ -54,7 +54,7 @@
         <div id="sidebarSteps"></div>
       </div>
 
-      <div class="sidebar-section sidebar-stats" id="sidebarStats" style="display:none">
+      <div class="sidebar-section sidebar-stats u-d-none" id="sidebarStats">
         <div class="sidebar-label">MÉTRICAS</div>
         <div class="stat-item"><span class="stat-label">Tokens In</span><span class="stat-value" id="statTokensIn">0</span></div>
         <div class="stat-item"><span class="stat-label">Tokens Out</span><span class="stat-value" id="statTokensOut">0</span></div>
@@ -79,7 +79,7 @@
         <div id="tabConcepto" class="tab-content active">
           <!-- API & Provider Section -->
           <div class="api-section" id="apiSection">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div class="u-flex u-justify-between u-align-center u-mb-10">
               <label class="api-label">🔑 API Key</label>
               <div class="provider-select" id="providerSelect">
                 <button class="provider-option active" data-provider="anthropic">Claude</button>
@@ -91,20 +91,20 @@
           </div>
 
           <!-- Niche Input -->
-          <div class="input-row" style="margin-top:20px; display:flex; gap:12px;">
-            <input type="text" id="nicheInput" class="input niche-input" placeholder="ej: productividad para freelancers latinoamericanos..." style="flex:1;" />
-            <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="input-row u-mt-20 u-flex u-gap-12">
+            <input type="text" id="nicheInput" class="input niche-input u-flex-1" placeholder="ej: productividad para freelancers latinoamericanos..." />
+            <div class="u-flex u-flex-col u-gap-8">
               <button id="btnRun" class="btn-primary" onclick="window.__startAgent()">
                 <span class="btn-icon">▶</span> RUN
               </button>
-              <button id="btnResume" class="btn-ghost btn-sm" onclick="window.__runEnglishOnly()" style="font-size:11px; margin:0; padding:4px 8px;" title="Retomar generación saltando a la parte en inglés si ya tienes el español">
+              <button id="btnResume" class="btn-ghost btn-sm u-fs-11 u-m-0" onclick="window.__runEnglishOnly()" title="Retomar generación saltando a la parte en inglés si ya tienes el español">
                 ⏩ Reanudar Inglés
               </button>
             </div>
           </div>
 
           <!-- Progress -->
-          <div class="progress-wrap" id="progressWrap" style="display:none; margin-top:20px;">
+          <div class="progress-wrap u-d-none u-mt-20" id="progressWrap">
             <div class="progress-info">
               <span id="progressLabel">Iniciando...</span>
               <span id="progressPct">0%</span>
@@ -113,43 +113,43 @@
           </div>
 
           <!-- Done Banner -->
-          <div class="done-banner" id="doneBanner" style="display:none; margin-top:20px;">
+          <div class="done-banner u-d-none u-mt-20" id="doneBanner">
             <div>
-              <p style="font-size:13px;color:var(--accent-success);font-weight:700">🎉 Estrategia completada</p>
-              <span style="font-size:10px;color:var(--text-muted)">Continuá a Production Studio para generar archivos.</span>
+              <p class="u-fs-13 u-color-success u-fw-700 u-m-0">🎉 Estrategia completada</p>
+              <span class="u-fs-10 u-color-muted">Continuá a Production Studio para generar archivos.</span>
             </div>
-            <div style="display:flex;gap:6px">
-              <button class="btn-primary btn-sm" id="btnGoToStudio" style="font-size:11px;">Ir al Studio →</button>
+            <div class="u-flex u-gap-6">
+              <button class="btn-primary btn-sm u-fs-11" id="btnGoToStudio">Ir al Studio →</button>
             </div>
           </div>
 
           <!-- Error Box -->
-          <div class="error-box" id="errorBox" style="display:none; margin-top:20px;"></div>
+          <div class="error-box u-d-none u-mt-20" id="errorBox"></div>
 
           <!-- Steps List -->
-          <div class="steps-list" id="stepsList" style="margin-top:20px;"></div>
+          <div class="steps-list u-mt-20" id="stepsList"></div>
 
           <!-- Log Panel -->
-          <div class="log-panel" id="logPanel" style="display:none; margin-top:20px;">
+          <div class="log-panel u-d-none u-mt-20" id="logPanel">
             <div class="log-header">
-              <span style="font-size:11px;font-weight:600;color:var(--text-secondary)">ORCHESTRATOR LOG</span>
+              <span class="u-fs-11 u-fw-600 u-color-secondary">ORCHESTRATOR LOG</span>
               <button class="btn-ghost btn-sm" id="btnClearLog">Limpiar</button>
             </div>
             <div class="log-body" id="logBody"></div>
           </div>
 
           <!-- Reset -->
-          <button class="btn-ghost" id="resetBtn" style="display:none;width:100%;margin-top:12px;font-size:11px;color:var(--text-muted)" onclick="window.__resetAll()">↩ Empezar con otro nicho</button>
+          <button class="btn-ghost u-d-none u-w-100 u-mt-12 u-fs-11 u-color-muted" id="resetBtn" onclick="window.__resetAll()">↩ Empezar con otro nicho</button>
         </div>
 
         <!-- TAB 2: PRODUCTION STUDIO -->
-        <div id="tabProduccion" class="tab-content" style="display:none;">
-          <div class="card" style="margin-bottom: 20px;">
+        <div id="tabProduccion" class="tab-content u-d-none">
+          <div class="card u-mb-20">
             <div class="card-header">
-              <h2 style="font-size:14px; margin:0;">🤖 Agente 2: Production Studio</h2>
+              <h2 class="u-fs-14 u-m-0">🤖 Agente 2: Production Studio</h2>
             </div>
             <div class="card-body">
-              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+              <p class="u-fs-12 u-color-secondary u-mb-16">
                 Este agente lee el outline de tu curso y genera los entregables listos para usar (PDF, Notion).
               </p>
               <button class="btn-primary" id="btnBuildEbook">Generar eBook Profesional (PDF)</button>
@@ -157,41 +157,41 @@
             </div>
           </div>
 
-          <div class="card" style="margin-bottom: 20px;">
+          <div class="card u-mb-20">
             <div class="card-header">
-              <h2 style="font-size:14px; margin:0;">🚀 Agente 3: Launch Manager</h2>
+              <h2 class="u-fs-14 u-m-0">🚀 Agente 3: Launch Manager</h2>
             </div>
             <div class="card-body">
-              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+              <p class="u-fs-12 u-color-secondary u-mb-16">
                 Genera tu página de ventas (Landing Page) en HTML/CSS lista para subir a tu servidor o plataforma.
               </p>
               <button class="btn-success" id="btnBuildSalesPage">Generar Sales Page (ZIP)</button>
             </div>
           </div>
 
-          <div class="card" style="margin-bottom: 20px; border: 1px solid rgba(245, 158, 11, 0.25); background: rgba(245, 158, 11, 0.02);">
-            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size:16px;">👑</span>
-              <h2 style="font-size:14px; margin:0; color: var(--accent-primary);">Master Kit: Exportar Todo el Proyecto</h2>
+          <div class="card u-mb-20">
+            <div class="card-header u-flex u-align-center u-gap-8">
+              <span class="u-fs-16">👑</span>
+              <h2 class="u-fs-14 u-m-0 u-color-primary">Master Kit: Exportar Todo el Proyecto</h2>
             </div>
             <div class="card-body">
-              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+              <p class="u-fs-12 u-color-secondary u-mb-16">
                 Descarga todo el material generado por la fábrica (ebook, notion, landing page, branding, posts, videos y escala) en un solo archivo estructurado.
               </p>
-              <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button class="btn-primary" id="btnBuildMasterZip" style="background: linear-gradient(135deg, var(--accent-primary) 0%, #d97706 100%); border:none; color:black; font-weight:700;">📦 Descargar Master ZIP Kit</button>
+              <div class="u-flex u-gap-10 u-flex-wrap">
+                <button class="btn-primary btn-master-zip" id="btnBuildMasterZip">📦 Descargar Master ZIP Kit</button>
                 <button class="btn-secondary" id="btnDlAllMd">📄 Todo en un Markdown (.md)</button>
                 <button class="btn-secondary" id="btnDlAllJson">💾 Respaldo de Datos (.json)</button>
               </div>
             </div>
           </div>
 
-          <div id="studioPreviewArea" style="display:none;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-              <h3 style="font-size:13px; color:var(--text-primary);">Vista Previa (PDF)</h3>
+          <div id="studioPreviewArea" class="u-d-none">
+            <div class="u-flex u-justify-between u-mb-10">
+              <h3 class="u-fs-13">Vista Previa (PDF)</h3>
               <button class="btn-success btn-sm" id="btnDownloadPdf">Descargar PDF Final</button>
             </div>
-            <div id="pdfContainer" style="background:white; color:black; padding:40px; border-radius:8px; max-height:600px; overflow-y:auto; box-shadow:var(--shadow-lg);">
+            <div id="pdfContainer" class="u-bg-white u-color-black u-p-40 u-rounded-8 u-max-h-600 u-overflow-y-auto u-shadow-lg">
               <!-- PDF content will be injected here -->
             </div>
           </div>
@@ -199,27 +199,27 @@
       </div>
 
       <!-- VIEW: SESSIONS -->
-      <div id="viewSessions" class="view-content" style="display:none;">
+      <div id="viewSessions" class="view-content u-d-none">
         <div class="card">
-          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 style="font-size:14px; margin:0;">📁 Historial de Sesiones</h2>
+          <div class="card-header u-flex u-justify-between u-align-center">
+            <h2 class="u-fs-14 u-m-0">📁 Historial de Sesiones</h2>
             <button class="btn-ghost btn-sm" id="btnRefreshSessions">🔄 Actualizar</button>
           </div>
-          <div class="card-body" style="padding: 0;">
-            <div style="overflow-x: auto;">
-              <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
-                <thead style="background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle);">
+          <div class="card-body u-p-0">
+            <div class="u-overflow-x-auto">
+              <table class="table-custom">
+                <thead class="table-header">
                   <tr>
-                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Fecha</th>
-                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Nicho / Producto</th>
-                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Pasos</th>
-                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Estado</th>
-                    <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary); text-align: right;">Acciones</th>
+                    <th>Fecha</th>
+                    <th>Nicho / Producto</th>
+                    <th>Pasos</th>
+                    <th>Estado</th>
+                    <th class="u-text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="sessionsTableBody">
                   <tr>
-                    <td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">
+                    <td colspan="5">
                       Cargando sesiones...
                     </td>
                   </tr>
@@ -231,34 +231,33 @@
       </div>
 
       <!-- VIEW: SETTINGS -->
-      <div id="viewSettings" class="view-content" style="display:none;">
-        <div class="card" style="margin-bottom: 20px;">
+      <div id="viewSettings" class="view-content u-d-none">
+        <div class="card u-mb-20">
           <div class="card-header">
-            <h2 style="font-size:14px; margin:0;">🤖 Modelos por Defecto</h2>
+            <h2 class="u-fs-14 u-m-0">🤖 Modelos por Defecto</h2>
           </div>
           <div class="card-body">
-            <div class="input-row" style="display:flex; gap:20px; flex-wrap:wrap;">
-              <div style="flex:1; min-width: 200px;">
+            <div class="input-row u-flex u-gap-20 u-flex-wrap">
+              <div class="u-flex-1">
                 <label class="api-label">Modelo Anthropic (Claude)</label>
                 <select id="settingModelAnthropic" class="input" style="padding: 6px 12px; height: auto;">
                 </select>
               </div>
-              <div style="flex:1; min-width: 200px;">
+              <div class="u-flex-1">
                 <label class="api-label">Modelo Gemini</label>
-                <select id="settingModelGemini" class="input" style="padding: 6px 12px; height: auto;">
-                </select>
+                <select id="settingModelGemini" class="input"></select>
               </div>
             </div>
           </div>
         </div>
         
-        <div class="card" style="margin-bottom: 20px;">
+        <div class="card u-mb-20">
           <div class="card-header">
-            <h2 style="font-size:14px; margin:0;">🎭 Tono del Producto</h2>
+            <h2 class="u-fs-14 u-m-0">🎭 Tono del Producto</h2>
           </div>
           <div class="card-body">
-            <label class="api-label" style="margin-bottom: 10px;">Selecciona el estilo de escritura de los agentes:</label>
-            <div class="provider-select" id="settingToneSelect" style="display: inline-flex; flex-wrap: wrap;">
+            <label class="api-label u-mb-10">Selecciona el estilo de escritura de los agentes:</label>
+            <div class="provider-select u-flex-wrap" id="settingToneSelect">
               <button class="provider-option active" data-tone="profesional">Profesional</button>
               <button class="provider-option" data-tone="casual">Casual</button>
               <button class="provider-option" data-tone="emocional">Emocional</button>
@@ -269,28 +268,28 @@
 
         <div class="card">
           <div class="card-header">
-            <h2 style="font-size:14px; margin:0;">🧠 System Prompts</h2>
+            <h2 class="u-fs-14 u-m-0">🧠 System Prompts</h2>
           </div>
           <div class="card-body">
-            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:16px;">
+            <p class="u-fs-12 u-color-secondary u-mb-16">
               Edita el comportamiento base de los agentes. Deja en blanco para usar el valor por defecto.
             </p>
-            <div style="margin-bottom: 15px;">
+            <div class="u-mb-15">
               <label class="api-label">System Prompt (LatAm)</label>
-              <textarea id="settingPromptLatam" class="input" style="height: 120px; font-family: var(--font-mono); font-size: 11px; resize: vertical;" placeholder="Default LatAm prompt..."></textarea>
+              <textarea id="settingPromptLatam" class="input textarea-settings" placeholder="Default LatAm prompt..."></textarea>
             </div>
             <div>
               <label class="api-label">System Prompt (Global/US)</label>
-              <textarea id="settingPromptUs" class="input" style="height: 120px; font-family: var(--font-mono); font-size: 11px; resize: vertical;" placeholder="Default Global prompt..."></textarea>
+              <textarea id="settingPromptUs" class="input textarea-settings" placeholder="Default Global prompt..."></textarea>
             </div>
-            <div style="margin-top: 15px; display:flex; justify-content:flex-end;">
+            <div class="u-mt-15 u-flex u-flex-end">
               <button class="btn-primary btn-sm" id="btnSaveSettings">Guardar Ajustes</button>
             </div>
           </div>
         </div>
       </div>
 
-      <p style="text-align:center;font-size:10px;color:var(--text-disabled);margin-top:20px;">
+      <p class="u-text-center u-fs-10 u-color-disabled u-mt-20">
         Fábrica de Productos Digitales v2.0 · Local Multi-Agent Architecture
       </p>
     </main>
