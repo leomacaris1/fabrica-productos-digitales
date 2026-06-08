@@ -1,3 +1,4 @@
+// ─── Pipeline Steps ──────────────────────────────────────────────────────
 export const STEPS = [
   { id: 1, title: 'Ideas con demanda real', emoji: '🔍', desc: '10 ideas completas', expectedItems: 10 },
   { id: 2, title: 'Validar la idea ganadora', emoji: '✅', desc: '5 secciones de análisis', expectedItems: 5 },
@@ -11,6 +12,7 @@ export const STEPS = [
   { id: 10, title: 'Cómo escalar con contexto', emoji: '🧠', desc: '5 secciones + 5 prompts', expectedItems: 5 }
 ];
 
+// ─── System Prompts ───────────────────────────────────────────────────────
 export const SYSTEM_PROMPTS = {
   'es-latam': `Eres un redactor y creador de infoproductos experto en el mercado de América Latina.
 REGLAS ABSOLUTAS:
@@ -34,6 +36,7 @@ ABSOLUTE RULES:
 8. TRANSLATE EVERYTHING: If the prompt requests a table with Spanish headers (e.g. "Beneficio", "Formato"), you MUST translate those headers to English in your response. The entire output must be 100% in English, including structural labels and titles.`
 };
 
+// ─── QA System Prompts ────────────────────────────────────────────────────
 export const QA_SYSTEM_PROMPTS = {
   'es-latam': `Eres un agente de control de calidad (QA) especializado en infoproductos para Latinoamérica.
 Tu tarea es revisar exhaustivamente el contenido, corregir TODOS los errores ortográficos y gramaticales, reemplazar cualquier palabra inventada o sin sentido, y completar el texto si quedó truncado.
@@ -47,52 +50,58 @@ DO NOT add any greetings, preambles, explanations, or notes about what you fixed
 CRITICAL RULE: If you see any structural headers, table columns, or labels in Spanish (like "Beneficio específico", "Formato", "BONO"), you MUST translate them to English. The entire output must be 100% English.`
 };
 
+// ─── Providers ────────────────────────────────────────────────────────────
 export const PROVIDERS = {
   ANTHROPIC: 'anthropic',
-  GEMINI: 'gemini'
+  GEMINI: 'gemini',
+  OPENROUTER: 'openrouter',
+  OLLAMA: 'ollama',
 };
 
-// ─── Model Catalog (api-design-best-practices) ──────────────────────────
-export const MODEL_CATALOG = {
-  anthropic: [
-    { id: 'claude-haiku-4-5-20251001', label: 'Claude 4.5 Haiku', speed: 'fast', inputCostPer1M: 0.80, outputCostPer1M: 4.00 },
-    { id: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4', speed: 'balanced', inputCostPer1M: 3.00, outputCostPer1M: 15.00 },
-    { id: 'claude-opus-4-20250514', label: 'Claude Opus 4', speed: 'powerful', inputCostPer1M: 15.00, outputCostPer1M: 75.00 },
-  ],
-  gemini: [
-    { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', speed: 'fast', inputCostPer1M: 0.15, outputCostPer1M: 0.60 },
-    { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', speed: 'powerful', inputCostPer1M: 1.25, outputCostPer1M: 10.00 },
-  ],
-};
-
-export const TONE_PRESETS = [
-  { id: 'casual-latam', label: '🌎 Casual LatAm', desc: 'Cálido, cercano, empático' },
-  { id: 'formal', label: '🎩 Formal', desc: 'Profesional y corporativo' },
-  { id: 'aggressive-sales', label: '🔥 Ventas Agresivas', desc: 'Copy directo, urgencia y escasez' },
-  { id: 'academic', label: '📚 Académico', desc: 'Técnico, datos duros, serio' },
-  { id: 'storytelling', label: '📖 Storytelling', desc: 'Narrativo, emocional, historias' },
-];
-
+// ─── Available Models (used by UI selectors and cost calculator) ──────────
 export const AVAILABLE_MODELS = {
   anthropic: [
-    { id: 'claude-haiku-4-5-20251001', name: 'Claude 3.5 Haiku', input: 0.80, output: 4.00, tokens: 8000 },
-    { id: 'claude-sonnet-4-20250514', name: 'Claude 3.5 Sonnet', input: 3.00, output: 15.00, tokens: 8192 },
+    { id: 'claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5', input: 0.80, output: 4.00, tokens: 8000 },
+    { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', input: 3.00, output: 15.00, tokens: 8192 },
     { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet (Legacy)', input: 3.00, output: 15.00, tokens: 8192 }
   ],
   gemini: [
     { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', input: 0.15, output: 0.60, tokens: 8192 },
     { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', input: 0.15, output: 0.60, tokens: 8192 },
     { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', input: 1.25, output: 5.00, tokens: 8192 }
+  ],
+  openrouter: [
+    { id: 'meta-llama/llama-3.1-8b-instruct:free', name: '🆓 Llama 3.1 8B (Gratis)', input: 0, output: 0, tokens: 8192 },
+    { id: 'google/gemma-2-9b-it:free', name: '🆓 Gemma 2 9B (Gratis)', input: 0, output: 0, tokens: 8192 },
+    { id: 'qwen/qwen-2.5-7b-instruct:free', name: '🆓 Qwen 2.5 7B (Gratis)', input: 0, output: 0, tokens: 8192 },
+    { id: 'meta-llama/llama-3.1-70b-instruct', name: 'Llama 3.1 70B', input: 0.10, output: 0.10, tokens: 8192 },
+    { id: 'mistralai/mixtral-8x7b-instruct', name: 'Mixtral 8x7B', input: 0.24, output: 0.24, tokens: 32768 },
+    { id: 'google/gemini-2.0-flash-001', name: 'Gemini 2.0 Flash (OR)', input: 0.10, output: 0.40, tokens: 8192 }
+  ],
+  ollama: [
+    { id: 'llama3.1', name: 'Llama 3.1 (Local)', input: 0, output: 0, tokens: 8192 },
+    { id: 'qwen2.5:7b', name: 'Qwen 2.5 7B (Local)', input: 0, output: 0, tokens: 8192 },
+    { id: 'mistral', name: 'Mistral 7B (Local)', input: 0, output: 0, tokens: 8192 },
+    { id: 'gemma2:9b', name: 'Gemma 2 9B (Local)', input: 0, output: 0, tokens: 8192 }
   ]
 };
 
+// ─── Provider Endpoints ───────────────────────────────────────────────────
 export const MODEL_CONFIG = {
   anthropic: {
     endpoint: 'https://api.anthropic.com/v1/messages',
   },
   gemini: {
     endpoint: 'https://generativelanguage.googleapis.com/v1beta/models',
-  }
+  },
+  openrouter: {
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+  },
+  ollama: {
+    // Editable in Settings — defaults to localhost
+    endpoint: 'http://localhost:11434/v1/chat/completions',
+  },
 };
 
+// ─── Derived helpers ──────────────────────────────────────────────────────
 export const STEP_TITLES = Object.fromEntries(STEPS.map(s => [s.id, `${s.emoji} ${s.title}`]));

@@ -9,7 +9,16 @@ const DEFAULTS = {
   model: {
     anthropic: 'claude-haiku-4-5-20251001',
     gemini: 'gemini-2.5-flash',
+    openrouter: 'meta-llama/llama-3.1-8b-instruct:free',
+    ollama: 'llama3.1',
   },
+
+  // Credentials
+  openrouterApiKey: '',
+  ollamaEndpoint: 'http://localhost:11434',
+
+  // Prompt cache
+  cacheEnabled: false,
 
   // Tone
   tone: 'profesional', // profesional | casual | emocional | directo

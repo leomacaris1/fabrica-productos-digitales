@@ -454,20 +454,29 @@ function initSettingsUI() {
 
 function loadSettingsToUI() {
   const s = loadSettings();
-  
+
   // Theme
   document.documentElement.dataset.theme = s.theme || 'dark';
 
   // Models
   if ($('settingModelAnthropic')) $('settingModelAnthropic').value = s.model.anthropic;
   if ($('settingModelGemini')) $('settingModelGemini').value = s.model.gemini;
-  
+  if ($('settingModelOpenrouter')) $('settingModelOpenrouter').value = s.model.openrouter;
+  if ($('settingModelOllama')) $('settingModelOllama').value = s.model.ollama;
+
+  // OpenRouter & Ollama credentials
+  if ($('settingOpenrouterKey')) $('settingOpenrouterKey').value = s.openrouterApiKey || '';
+  if ($('settingOllamaEndpoint')) $('settingOllamaEndpoint').value = s.ollamaEndpoint || 'http://localhost:11434';
+
+  // Cache toggle
+  if ($('settingCacheEnabled')) $('settingCacheEnabled').checked = s.cacheEnabled === true;
+
   // Tone
   const toneButtons = document.querySelectorAll('#settingToneSelect .provider-option');
   toneButtons.forEach(b => {
     b.classList.toggle('active', b.dataset.tone === s.tone);
   });
-  
+
   // Prompts
   if ($('settingPromptLatam')) $('settingPromptLatam').value = s.customSystemPrompt['es-latam'] || '';
   if ($('settingPromptUs')) $('settingPromptUs').value = s.customSystemPrompt['en-us'] || '';

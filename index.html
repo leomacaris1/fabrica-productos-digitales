@@ -86,6 +86,8 @@
                   <div class="provider-select" id="providerSelect">
                     <button class="provider-option active" data-provider="anthropic">Claude</button>
                     <button class="provider-option" data-provider="gemini">Gemini</button>
+                    <button class="provider-option" data-provider="openrouter">OpenRouter</button>
+                    <button class="provider-option" data-provider="ollama">Ollama 🏠</button>
                   </div>
                 </div>
                 <input type="password" id="apiKey" class="input" placeholder="sk-ant-api03-... o AIza..." autocomplete="off" />
@@ -247,9 +249,11 @@
 
       <!-- VIEW: SETTINGS -->
       <div id="viewSettings" class="view-content u-d-none">
+
+        <!-- Section: Modelos Anthropic & Gemini -->
         <div class="card u-mb-20">
           <div class="card-header">
-            <h2 class="u-fs-14 u-m-0">🤖 Modelos por Defecto</h2>
+            <h2 class="u-fs-14 u-m-0">🤖 Modelos Nativos (Anthropic & Gemini)</h2>
           </div>
           <div class="card-body">
             <div class="input-row u-flex u-gap-20 u-flex-wrap">
@@ -265,7 +269,68 @@
             </div>
           </div>
         </div>
-        
+
+        <!-- Section: OpenRouter -->
+        <div class="card u-mb-20">
+          <div class="card-header u-flex u-align-center u-gap-8">
+            <span>🌐</span>
+            <h2 class="u-fs-14 u-m-0">OpenRouter <span class="badge badge-success">Gratis disponible</span></h2>
+          </div>
+          <div class="card-body">
+            <p class="u-fs-12 u-color-secondary u-mb-16">Accede a decenas de modelos (incluyendo Llama, Qwen, Mistral) con una sola key. Muchos son 100% gratuitos. Obtén tu key en <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" class="u-color-primary">openrouter.ai/keys</a>.</p>
+            <div class="u-flex u-gap-20 u-flex-wrap">
+              <div class="u-flex-1">
+                <label class="api-label">OpenRouter API Key</label>
+                <input type="password" id="settingOpenrouterKey" class="input" placeholder="sk-or-v1-..." autocomplete="off" />
+              </div>
+              <div class="u-flex-1">
+                <label class="api-label">Modelo OpenRouter</label>
+                <select id="settingModelOpenrouter" class="input" title="Seleccionar Modelo OpenRouter" aria-label="Seleccionar Modelo OpenRouter"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Ollama Local -->
+        <div class="card u-mb-20">
+          <div class="card-header u-flex u-align-center u-gap-8">
+            <span>🏠</span>
+            <h2 class="u-fs-14 u-m-0">Ollama Local <span class="badge badge-amber">Costo $0.00</span></h2>
+          </div>
+          <div class="card-body">
+            <p class="u-fs-12 u-color-secondary u-mb-16">Ejecuta modelos IA directamente en tu PC. Requiere <a href="https://ollama.ai" target="_blank" rel="noopener" class="u-color-primary">Ollama</a> instalado y corriendo. Perfecto para pruebas sin costo.</p>
+            <div class="u-flex u-gap-20 u-flex-wrap">
+              <div class="u-flex-1">
+                <label class="api-label">Endpoint de Ollama</label>
+                <input type="text" id="settingOllamaEndpoint" class="input" placeholder="http://localhost:11434" />
+              </div>
+              <div class="u-flex-1">
+                <label class="api-label">Modelo Ollama</label>
+                <select id="settingModelOllama" class="input" title="Seleccionar Modelo Ollama" aria-label="Seleccionar Modelo Ollama"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Cache -->
+        <div class="card u-mb-20">
+          <div class="card-header u-flex u-align-center u-gap-8">
+            <span>⚡</span>
+            <h2 class="u-fs-14 u-m-0">Caché de Prompts</h2>
+          </div>
+          <div class="card-body">
+            <p class="u-fs-12 u-color-secondary u-mb-16">Al activar la caché, las respuestas idénticas se guardan en memoria de la sesión. Útil para re-ejecutar pasos sin consumir tokens (ideal durante desarrollo y pruebas).</p>
+            <div class="u-flex u-align-center u-gap-12">
+              <label class="toggle-label">
+                <input type="checkbox" id="settingCacheEnabled" />
+                <span class="toggle-track"></span>
+                <span class="u-fs-12 u-color-secondary">Activar Caché de Sesión</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Tono -->
         <div class="card u-mb-20">
           <div class="card-header">
             <h2 class="u-fs-14 u-m-0">🎭 Tono del Producto</h2>
@@ -281,6 +346,7 @@
           </div>
         </div>
 
+        <!-- Section: System Prompts -->
         <div class="card">
           <div class="card-header">
             <h2 class="u-fs-14 u-m-0">🧠 System Prompts</h2>
