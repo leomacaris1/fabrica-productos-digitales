@@ -77,122 +77,137 @@
 
         <!-- TAB 1: CONCEPTO -->
         <div id="tabConcepto" class="tab-content active">
-          <!-- API & Provider Section -->
-          <div class="api-section" id="apiSection">
-            <div class="u-flex u-justify-between u-align-center u-mb-10">
-              <label class="api-label">🔑 API Key</label>
-              <div class="provider-select" id="providerSelect">
-                <button class="provider-option active" data-provider="anthropic">Claude</button>
-                <button class="provider-option" data-provider="gemini">Gemini</button>
+          <div class="tab-grid-layout">
+            <div class="tab-grid-left">
+              <!-- API & Provider Section -->
+              <div class="api-section" id="apiSection">
+                <div class="u-flex u-justify-between u-align-center u-mb-10">
+                  <label class="api-label">🔑 API Key</label>
+                  <div class="provider-select" id="providerSelect">
+                    <button class="provider-option active" data-provider="anthropic">Claude</button>
+                    <button class="provider-option" data-provider="gemini">Gemini</button>
+                  </div>
+                </div>
+                <input type="password" id="apiKey" class="input" placeholder="sk-ant-api03-... o AIza..." autocomplete="off" />
+                <p class="api-hint" id="apiHint">Obtené tu key en <a href="https://console.anthropic.com/keys" target="_blank" rel="noopener" id="apiLink">console.anthropic.com/keys</a></p>
               </div>
+
+              <!-- Niche Input -->
+              <div class="input-row u-mt-0 u-flex u-gap-12">
+                <input type="text" id="nicheInput" class="input niche-input u-flex-1" placeholder="ej: productividad para freelancers latinoamericanos..." />
+                <div class="u-flex u-flex-col u-gap-8">
+                  <button id="btnRun" class="btn-primary" onclick="window.__startAgent()">
+                    <span class="btn-icon">▶</span> RUN
+                  </button>
+                  <button id="btnResume" class="btn-ghost btn-sm u-fs-11 u-m-0" onclick="window.__runEnglishOnly()" title="Retomar generación saltando a la parte en inglés si ya tienes el español">
+                    ⏩ Reanudar Inglés
+                  </button>
+                </div>
+              </div>
+
+              <!-- Progress -->
+              <div class="progress-wrap u-d-none" id="progressWrap">
+                <div class="progress-info">
+                  <span id="progressLabel">Iniciando...</span>
+                  <span id="progressPct">0%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+              </div>
+
+              <!-- Done Banner -->
+              <div class="done-banner u-d-none" id="doneBanner">
+                <div>
+                  <p class="u-fs-13 u-color-success u-fw-700 u-m-0">🎉 Estrategia completada</p>
+                  <span class="u-fs-10 u-color-muted">Continuá a Production Studio para generar archivos.</span>
+                </div>
+                <div class="u-flex u-gap-6">
+                  <button class="btn-primary btn-sm u-fs-11" id="btnGoToStudio">Ir al Studio →</button>
+                </div>
+              </div>
+
+              <!-- Error Box -->
+              <div class="error-box u-d-none" id="errorBox"></div>
+
+              <!-- Log Panel -->
+              <div class="log-panel u-d-none" id="logPanel">
+                <div class="log-header">
+                  <span class="u-fs-11 u-fw-600 u-color-secondary">ORCHESTRATOR LOG</span>
+                  <button class="btn-ghost btn-sm" id="btnClearLog">Limpiar</button>
+                </div>
+                <div class="log-body" id="logBody"></div>
+              </div>
+
+              <!-- Reset -->
+              <button class="btn-ghost u-d-none u-w-100 u-mt-0 u-fs-11 u-color-muted" id="resetBtn" onclick="window.__resetAll()">↩ Empezar con otro nicho</button>
             </div>
-            <input type="password" id="apiKey" class="input" placeholder="sk-ant-api03-... o AIza..." autocomplete="off" />
-            <p class="api-hint" id="apiHint">Obtené tu key en <a href="https://console.anthropic.com/keys" target="_blank" rel="noopener" id="apiLink">console.anthropic.com/keys</a></p>
+
+            <div class="tab-grid-right">
+              <!-- Steps List -->
+              <div class="steps-list" id="stepsList"></div>
+            </div>
           </div>
-
-          <!-- Niche Input -->
-          <div class="input-row u-mt-20 u-flex u-gap-12">
-            <input type="text" id="nicheInput" class="input niche-input u-flex-1" placeholder="ej: productividad para freelancers latinoamericanos..." />
-            <div class="u-flex u-flex-col u-gap-8">
-              <button id="btnRun" class="btn-primary" onclick="window.__startAgent()">
-                <span class="btn-icon">▶</span> RUN
-              </button>
-              <button id="btnResume" class="btn-ghost btn-sm u-fs-11 u-m-0" onclick="window.__runEnglishOnly()" title="Retomar generación saltando a la parte en inglés si ya tienes el español">
-                ⏩ Reanudar Inglés
-              </button>
-            </div>
-          </div>
-
-          <!-- Progress -->
-          <div class="progress-wrap u-d-none u-mt-20" id="progressWrap">
-            <div class="progress-info">
-              <span id="progressLabel">Iniciando...</span>
-              <span id="progressPct">0%</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-          </div>
-
-          <!-- Done Banner -->
-          <div class="done-banner u-d-none u-mt-20" id="doneBanner">
-            <div>
-              <p class="u-fs-13 u-color-success u-fw-700 u-m-0">🎉 Estrategia completada</p>
-              <span class="u-fs-10 u-color-muted">Continuá a Production Studio para generar archivos.</span>
-            </div>
-            <div class="u-flex u-gap-6">
-              <button class="btn-primary btn-sm u-fs-11" id="btnGoToStudio">Ir al Studio →</button>
-            </div>
-          </div>
-
-          <!-- Error Box -->
-          <div class="error-box u-d-none u-mt-20" id="errorBox"></div>
-
-          <!-- Steps List -->
-          <div class="steps-list u-mt-20" id="stepsList"></div>
-
-          <!-- Log Panel -->
-          <div class="log-panel u-d-none u-mt-20" id="logPanel">
-            <div class="log-header">
-              <span class="u-fs-11 u-fw-600 u-color-secondary">ORCHESTRATOR LOG</span>
-              <button class="btn-ghost btn-sm" id="btnClearLog">Limpiar</button>
-            </div>
-            <div class="log-body" id="logBody"></div>
-          </div>
-
-          <!-- Reset -->
-          <button class="btn-ghost u-d-none u-w-100 u-mt-12 u-fs-11 u-color-muted" id="resetBtn" onclick="window.__resetAll()">↩ Empezar con otro nicho</button>
         </div>
 
         <!-- TAB 2: PRODUCTION STUDIO -->
         <div id="tabProduccion" class="tab-content u-d-none">
-          <div class="card u-mb-20">
-            <div class="card-header">
-              <h2 class="u-fs-14 u-m-0">🤖 Agente 2: Production Studio</h2>
-            </div>
-            <div class="card-body">
-              <p class="u-fs-12 u-color-secondary u-mb-16">
-                Este agente lee el outline de tu curso y genera los entregables listos para usar (PDF, Notion).
-              </p>
-              <button class="btn-primary" id="btnBuildEbook">Generar eBook Profesional (PDF)</button>
-              <button class="btn-secondary" id="btnBuildNotion">Exportar Plantilla Notion (.md)</button>
-            </div>
-          </div>
+          <div class="tab-grid-layout">
+            <div class="tab-grid-left">
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="u-fs-14 u-m-0">🤖 Agente 2: Production Studio</h2>
+                </div>
+                <div class="card-body">
+                  <p class="u-fs-12 u-color-secondary u-mb-16">
+                    Este agente lee el outline de tu curso y genera los entregables listos para usar (PDF, Notion).
+                  </p>
+                  <button class="btn-primary u-w-100 u-mb-10" id="btnBuildEbook">Generar eBook (PDF)</button>
+                  <button class="btn-secondary u-w-100" id="btnBuildNotion">Exportar Plantilla Notion (.md)</button>
+                </div>
+              </div>
 
-          <div class="card u-mb-20">
-            <div class="card-header">
-              <h2 class="u-fs-14 u-m-0">🚀 Agente 3: Launch Manager</h2>
-            </div>
-            <div class="card-body">
-              <p class="u-fs-12 u-color-secondary u-mb-16">
-                Genera tu página de ventas (Landing Page) en HTML/CSS lista para subir a tu servidor o plataforma.
-              </p>
-              <button class="btn-success" id="btnBuildSalesPage">Generar Sales Page (ZIP)</button>
-            </div>
-          </div>
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="u-fs-14 u-m-0">🚀 Agente 3: Launch Manager</h2>
+                </div>
+                <div class="card-body">
+                  <p class="u-fs-12 u-color-secondary u-mb-16">
+                    Genera tu página de ventas (Landing Page) en HTML/CSS lista para subir a tu servidor o plataforma.
+                  </p>
+                  <button class="btn-success u-w-100" id="btnBuildSalesPage">Generar Sales Page (ZIP)</button>
+                </div>
+              </div>
 
-          <div class="card u-mb-20">
-            <div class="card-header u-flex u-align-center u-gap-8">
-              <span class="u-fs-16">👑</span>
-              <h2 class="u-fs-14 u-m-0 u-color-primary">Master Kit: Exportar Todo el Proyecto</h2>
-            </div>
-            <div class="card-body">
-              <p class="u-fs-12 u-color-secondary u-mb-16">
-                Descarga todo el material generado por la fábrica (ebook, notion, landing page, branding, posts, videos y escala) en un solo archivo estructurado.
-              </p>
-              <div class="u-flex u-gap-10 u-flex-wrap">
-                <button class="btn-primary btn-master-zip" id="btnBuildMasterZip">📦 Descargar Master ZIP Kit</button>
-                <button class="btn-secondary" id="btnDlAllMd">📄 Todo en un Markdown (.md)</button>
-                <button class="btn-secondary" id="btnDlAllJson">💾 Respaldo de Datos (.json)</button>
+              <div class="card">
+                <div class="card-header u-flex u-align-center u-gap-8">
+                  <span class="u-fs-16">👑</span>
+                  <h2 class="u-fs-14 u-m-0 u-color-primary">Master Kit: Exportar Todo</h2>
+                </div>
+                <div class="card-body">
+                  <p class="u-fs-12 u-color-secondary u-mb-16">
+                    Descarga todo el material generado por la fábrica (ebook, notion, landing page, branding, posts, videos y escala) en un solo archivo estructurado.
+                  </p>
+                  <div class="u-flex u-flex-col u-gap-10">
+                    <button class="btn-primary btn-master-zip u-w-100" id="btnBuildMasterZip">📦 Descargar Master ZIP Kit</button>
+                    <button class="btn-secondary u-w-100" id="btnDlAllMd">📄 Todo en un Markdown (.md)</button>
+                    <button class="btn-secondary u-w-100" id="btnDlAllJson">💾 Respaldo de Datos (.json)</button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div id="studioPreviewArea" class="u-d-none">
-            <div class="u-flex u-justify-between u-mb-10">
-              <h3 class="u-fs-13">Vista Previa (PDF)</h3>
-              <button class="btn-success btn-sm" id="btnDownloadPdf">Descargar PDF Final</button>
-            </div>
-            <div id="pdfContainer" class="u-bg-white u-color-black u-p-40 u-rounded-8 u-max-h-600 u-overflow-y-auto u-shadow-lg">
-              <!-- PDF content will be injected here -->
+            <div class="tab-grid-right">
+              <div id="studioPreviewArea" class="u-w-100">
+                <div class="u-flex u-justify-between u-mb-10">
+                  <h3 class="u-fs-13 u-m-0">Vista Previa (PDF)</h3>
+                  <button class="btn-success btn-sm" id="btnDownloadPdf">Descargar PDF Final</button>
+                </div>
+                <div id="pdfContainer" class="pdf-preview-container">
+                  <div class="u-text-center">
+                    <span style="font-size: 32px; display: block; margin-bottom: 10px;">📄</span>
+                    <span>Generá el eBook para ver la vista previa en este panel</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

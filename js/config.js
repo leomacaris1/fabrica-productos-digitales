@@ -73,11 +73,6 @@ export const TONE_PRESETS = [
   { id: 'storytelling', label: '📖 Storytelling', desc: 'Narrativo, emocional, historias' },
 ];
 
-export const PROVIDERS = {
-  ANTHROPIC: 'anthropic',
-  GEMINI: 'gemini'
-};
-
 export const AVAILABLE_MODELS = {
   anthropic: [
     { id: 'claude-haiku-4-5-20251001', name: 'Claude 3.5 Haiku', input: 0.80, output: 4.00, tokens: 8000 },

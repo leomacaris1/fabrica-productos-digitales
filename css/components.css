@@ -723,3 +723,26 @@ button {
 .table-header { background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); }
 .textarea-settings { height: 120px; font-family: var(--font-mono); font-size: 11px; resize: vertical; }
 .btn-master-zip { background: linear-gradient(135deg, var(--accent-primary) 0%, #d97706 100%); border:none; color:black; font-weight:700; }
+
+.pdf-preview-container {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  max-height: 700px;
+  overflow-y: auto;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.pdf-preview-container.has-content {
+  background-color: white;
+  color: black;
+  display: block;
+  border: 1px solid var(--border-subtle);
+}
+

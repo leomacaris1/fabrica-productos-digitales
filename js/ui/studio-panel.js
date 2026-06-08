@@ -90,6 +90,7 @@ export class StudioPanel {
     try {
       this.currentHtmlPdf = studio.generateEbookHtml(session);
       this.pdfContainer.innerHTML = this.currentHtmlPdf;
+      this.pdfContainer.classList.add('has-content');
       this.studioPreviewArea.style.display = 'block';
     } catch (e) {
       toast.error('Error renderizando HTML: ' + e.message);

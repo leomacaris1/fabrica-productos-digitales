@@ -182,3 +182,28 @@ body::after {
     display: none;
   }
 }
+
+.tab-grid-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.tab-grid-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tab-grid-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .tab-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
