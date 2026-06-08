@@ -18,6 +18,8 @@ import { buildPrompt as prompt07 } from '../prompts/paso-07-salespage.js';
 import { buildPrompt as prompt08 } from '../prompts/paso-08-repurposing.js';
 import { buildPrompt as prompt09 } from '../prompts/paso-09-contenido.js';
 import { buildPrompt as prompt10 } from '../prompts/paso-10-contexto.js';
+import { buildPrompt as buildAdapterPrompt } from '../prompts/adapter.js';
+import { adapterTranslate } from './adapter.js';
 
 const PROMPT_BUILDERS = {
   1: prompt01, 2: prompt02, 3: prompt03, 4: prompt04, 5: prompt05,
@@ -260,6 +262,104 @@ export async function runWorkflow({ niche, apiKey, provider, sessionId, language
     });
 
     callbacks.onLog?.(`❌ ${error.message}`, 'error');
+    callbacks.onError?.(error);
+    throw error;
+  }
+}
+
+/**
+ * Corre un flujo de adaptación cultural para traducir un bloque de resultados ya generados a otro idioma.
+ * Implementa el modo "Two-Pass".
+ */
+export async function runAdaptationWorkflow({ sessionEsData, apiKey, provider, sessionId, targetLanguage = 'en-us' }, callbacks) {
+  const results = {};
+  let totalIn = 0, totalOut = 0, totalCalls = 0;
+  
+  const ctx = {
+    niche: sessionEsData.niche,
+    productName: sessionEsData.productName
+  };
+
+  const settings = loadSettings();
+  const maxBudget = settings.maxBudget || 1.00;
+
+  const updateStats = () => {
+    const cost = calculateCost(provider, totalIn, totalOut);
+    if (cost > maxBudget && provider !== 'dry-run') {
+       throw new Error(`PRESUPUESTO SUPERADO: El costo estimado ($${cost.toFixed(4)}) excede tu límite de $${maxBudget.toFixed(2)}.`);
+    }
+    callbacks.onStats?.({
+      inputTokens: totalIn,
+      outputTokens: totalOut,
+      cost,
+      calls: totalCalls,
+      continuations: 0,
+      qaFixes: 0,
+      provider,
+    });
+  };
+
+  try {
+    for (const stepInfo of STEPS) {
+      const stepId = stepInfo.id;
+      const contentToAdapt = sessionEsData.results[stepId];
+      if (!contentToAdapt) continue;
+
+      callbacks.onProgress?.(stepId, 10);
+      callbacks.onStepStart?.(stepId, 'Adaptando al ' + targetLanguage + '...');
+      callbacks.onLog?.(`Paso ${stepId} — Adapter Agent (${targetLanguage})`, 'writer');
+
+      const onRetry = (attempt, delay, error) => {
+        callbacks.onRetry?.(stepId, attempt, delay, error);
+        callbacks.onLog?.(`Paso ${stepId} — Intento ${attempt}...`, 'error');
+      };
+
+      const prompt = buildAdapterPrompt(ctx, contentToAdapt, stepInfo.title);
+      
+      const adapterResult = await adapterTranslate({
+        content: prompt,
+        context: '', // Ya va incluido en el prompt
+        apiKey,
+        provider,
+        language: targetLanguage,
+        onRetry
+      });
+
+      totalIn += adapterResult.inputTokens || 0;
+      totalOut += adapterResult.outputTokens || 0;
+      totalCalls++;
+      updateStats();
+
+      const finalContent = cleanAgentOutput(adapterResult.text, stepId);
+      results[stepId] = finalContent;
+      
+      callbacks.onStepComplete?.(stepId, finalContent, { valid: true, message: 'Adaptado' });
+      callbacks.onLog?.(`Paso ${stepId} — Adaptación completada`, 'ok');
+    }
+
+    // Combine session
+    const sessionDual = {
+      ...sessionEsData,
+      isDual: true,
+      results_es: sessionEsData.results,
+      results_en: results,
+      results: results // set current results to english for UI temporarily
+    };
+    
+    // Accumulate total stats
+    if (sessionEsData.stats) {
+      sessionDual.stats.inputTokens += totalIn;
+      sessionDual.stats.outputTokens += totalOut;
+      sessionDual.stats.calls += totalCalls;
+      sessionDual.stats.cost = calculateCost(provider, sessionDual.stats.inputTokens, sessionDual.stats.outputTokens);
+    }
+    
+    saveSession(sessionId, sessionDual);
+    callbacks.onLog?.(`✅ Adaptación Completa. ${totalCalls} llamadas.`, 'ok');
+    callbacks.onComplete?.({ results, context: ctx });
+
+  } catch (error) {
+    callbacks.onLog?.(`❌ Error en adaptación: ${error.message}`, 'error');
     callbacks.onError?.(error);
     throw error;
   }

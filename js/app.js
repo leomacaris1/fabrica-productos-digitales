@@ -6,7 +6,7 @@ import '../css/animations.css';
 
 // Core imports
 import { STEPS, PROVIDERS } from './config.js';
-import { runWorkflow } from './agents/orchestrator.js';
+import { runWorkflow, runAdaptationWorkflow } from './agents/orchestrator.js';
 import { downloadAllMd, downloadAllJson, downloadStep } from './utils/download.js';
 import { generateSessionId, saveSession, loadSession, getLatestSessionId, listSessions, deleteSession } from './utils/session.js';
 import { renderPipeline, updatePipelineNode } from './ui/pipeline.js';
@@ -196,46 +196,47 @@ async function startAgent() {
 
   try {
     const callbacks = getCallbacks();
-    // Interceptamos el onComplete para que no muestre el doneBanner todavía
-    const originalOnComplete = callbacks.onComplete;
-    callbacks.onComplete = () => { /* no-op during first run */ };
+    const isDual = $('isDualMode') ? $('isDualMode').checked : true;
 
-    // 1. Ejecución Español (LatAm)
-    await runWorkflow(
-      { niche, apiKey, provider: currentProvider, sessionId, language: 'es-latam' },
-      callbacks
-    );
-    
-    // Obtenemos resultados ES de la sesión guardada
-    const sessionEs = loadSession(sessionId);
+    if (isDual) {
+      // Interceptamos el onComplete para que no muestre el doneBanner todavía
+      const originalOnComplete = callbacks.onComplete;
+      callbacks.onComplete = () => { /* no-op during first run */ };
 
-    // 2. Ejecución Inglés (US)
-    $('statusText').textContent = 'PROCESANDO INGLÉS (US)';
-    
-    // Reset pipeline visual but keep stats
-    results = {};
-    renderStepCards(STEPS);
-    renderPipeline(STEPS);
-    renderSidebarSteps();
-    
-    // Restore the real onComplete for the final run
-    callbacks.onComplete = (data) => {
-      originalOnComplete(data);
-    };
+      // 1. Ejecución Español (LatAm)
+      await runWorkflow(
+        { niche, apiKey, provider: currentProvider, sessionId, language: 'es-latam' },
+        callbacks
+      );
+      
+      // Obtenemos resultados ES de la sesión guardada
+      const sessionEs = loadSession(sessionId);
 
-    await runWorkflow(
-      { niche, apiKey, provider: currentProvider, sessionId, language: 'en-us' },
-      callbacks
-    );
-    
-    // Obtenemos la última sesión y la convertimos en una sesión DUAL
-    const sessionDual = loadSession(sessionId);
-    sessionDual.isDual = true;
-    sessionDual.results_es = sessionEs.results;
-    sessionDual.results_en = sessionDual.results;
-    
-    // Guardamos la sesión dual definitiva
-    saveSession(sessionId, sessionDual);
+      // 2. Ejecución Adaptación Inglés (US)
+      $('statusText').textContent = 'PROCESANDO INGLÉS (US)';
+      
+      // Reset pipeline visual but keep stats
+      results = {};
+      renderStepCards(STEPS);
+      renderPipeline(STEPS);
+      renderSidebarSteps();
+      
+      // Restore the real onComplete for the final run
+      callbacks.onComplete = (data) => {
+        originalOnComplete(data);
+      };
+
+      await runAdaptationWorkflow(
+        { sessionEsData: sessionEs, apiKey, provider: currentProvider, sessionId, targetLanguage: 'en-us' },
+        callbacks
+      );
+    } else {
+      // Ejecución única: Español solamente
+      await runWorkflow(
+        { niche, apiKey, provider: currentProvider, sessionId, language: 'es-latam' },
+        callbacks
+      );
+    }
 
   } catch (e) {
     // Error already handled in callbacks
@@ -319,16 +320,10 @@ async function runEnglishOnly() {
 
   try {
     const callbacks = getCallbacks();
-    await runWorkflow(
-      { niche, apiKey, provider: currentProvider, sessionId, language: 'en-us' },
+    await runAdaptationWorkflow(
+      { sessionEsData: sessionEs, apiKey, provider: currentProvider, sessionId, targetLanguage: 'en-us' },
       callbacks
     );
-    
-    const sessionDual = loadSession(sessionId);
-    sessionDual.isDual = true;
-    sessionDual.results_es = sessionEs.results;
-    sessionDual.results_en = sessionDual.results;
-    saveSession(sessionId, sessionDual);
   } catch (e) {
     // handled
   }

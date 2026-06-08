@@ -95,7 +95,14 @@
                 <p class="api-hint" id="apiHint">Obtené tu key en <a href="https://console.anthropic.com/keys" target="_blank" rel="noopener" id="apiLink">console.anthropic.com/keys</a></p>
               </div>
 
-              <!-- Niche Input -->
+              <!-- Niche Input & Dual Toggle -->
+              <div class="u-flex u-align-center u-mb-10">
+                <label class="toggle-label">
+                  <input type="checkbox" id="isDualMode" checked />
+                  <span class="toggle-track"></span>
+                  <span class="u-fs-12 u-color-secondary">Generar versión en Inglés (Adaptación)</span>
+                </label>
+              </div>
               <div class="input-row u-mt-0 u-flex u-gap-12">
                 <input type="text" id="nicheInput" class="input niche-input u-flex-1" placeholder="ej: productividad para freelancers latinoamericanos..." />
                 <div class="u-flex u-flex-col u-gap-8">
