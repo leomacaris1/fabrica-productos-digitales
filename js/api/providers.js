@@ -30,30 +30,55 @@ export async function callLLM({ prompt, systemPrompt, apiKey, provider, maxToken
     }
   }
 
-  // ── Route to provider ───────────────────────────────────────────────────
+  // ── Route to provider with Fallback ──────────────────────────────────────
   let result;
-  switch (provider) {
-    case PROVIDERS.ANTHROPIC:
-      result = await callAnthropic(prompt, systemPrompt, apiKey, maxTokens, onRetry);
-      break;
-    case PROVIDERS.GEMINI:
-      result = await callGemini(prompt, systemPrompt, apiKey, maxTokens, onRetry);
-      break;
-    case PROVIDERS.OPENROUTER: {
-      const orKey = settings.openrouterApiKey || apiKey;
-      result = await callOpenRouter(prompt, systemPrompt, orKey, maxTokens, onRetry);
-      break;
+  try {
+    switch (provider) {
+      case PROVIDERS.ANTHROPIC:
+        result = await callAnthropic(prompt, systemPrompt, apiKey, maxTokens, onRetry);
+        break;
+      case PROVIDERS.GEMINI:
+        result = await callGemini(prompt, systemPrompt, apiKey, maxTokens, onRetry);
+        break;
+      case PROVIDERS.OPENROUTER: {
+        const orKey = settings.openrouterApiKey || apiKey;
+        try {
+          result = await callOpenRouter(prompt, systemPrompt, orKey, maxTokens, onRetry);
+        } catch (error) {
+          // Fallback Automático para OpenRouter (Modelos gratuitos)
+          console.warn(`[Fallback] Error con el modelo principal de OpenRouter: ${error.message}. Intentando con Qwen 2.5 7B gratuito...`);
+          if (onRetry) onRetry('fallback', 1, 0, error); // Notify UI loosely
+          
+          // Cambiamos temporalmente el activeModelId para la caché si tiene éxito
+          const fallbackModel = 'qwen/qwen-2.5-7b-instruct:free';
+          const originalGetActiveModel = settings.model.openrouter;
+          settings.model.openrouter = fallbackModel;
+          
+          try {
+            result = await callOpenRouter(prompt, systemPrompt, orKey, maxTokens, null); // Sin onRetry interno para el fallback inmediato
+          } catch (fallbackError) {
+             console.warn(`[Fallback] Qwen también falló: ${fallbackError.message}. Intentando Gemma 2 9B gratuito...`);
+             settings.model.openrouter = 'google/gemma-2-9b-it:free';
+             result = await callOpenRouter(prompt, systemPrompt, orKey, maxTokens, null);
+          }
+        }
+        break;
+      }
+      case PROVIDERS.OLLAMA:
+        result = await callOllama(prompt, systemPrompt, apiKey, maxTokens, onRetry);
+        break;
+      default:
+        throw new Error(`Provider desconocido: ${provider}`);
     }
-    case PROVIDERS.OLLAMA:
-      result = await callOllama(prompt, systemPrompt, apiKey, maxTokens, onRetry);
-      break;
-    default:
-      throw new Error(`Provider desconocido: ${provider}`);
+  } catch (error) {
+    throw error; // Re-throw si fallaron todos los fallbacks o si es un provider sin fallback aún
   }
 
   // ── Cache write ─────────────────────────────────────────────────────────
   if (cacheEnabled && result) {
-    setCache(prompt, systemPrompt, activeModelId, result);
+    // Usamos el modelo real que funcionó (puede ser el fallback)
+    const effectiveModelId = provider === PROVIDERS.OPENROUTER ? settings.model.openrouter : activeModelId;
+    setCache(prompt, systemPrompt, effectiveModelId, result);
   }
 
   return result;
