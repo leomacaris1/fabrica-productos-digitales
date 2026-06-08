@@ -27,8 +27,8 @@ body::after {
   justify-content: space-between;
   padding: 0 var(--space-xl);
   background-color: rgba(6, 8, 15, 0.6);
-  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   z-index: 100;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -85,8 +85,8 @@ body::after {
 
 .sidebar {
   background-color: rgba(12, 16, 25, 0.5);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border-right: 1px solid rgba(255, 255, 255, 0.03);
   padding: var(--space-xl) 0;
   display: flex;
