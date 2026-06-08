@@ -109,6 +109,11 @@ function getCallbacks() {
       addLog(message, type);
     },
 
+    onRetry(stepId, attempt, delay, error) {
+      const sec = (delay / 1000).toFixed(0);
+      toast.warning(`Reintentando paso ${stepId} (intento ${attempt} en ${sec}s...)`);
+    },
+
     onProgress(step, total) {
       updateProgress(step, total);
     },

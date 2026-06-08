@@ -10,7 +10,7 @@ import { getActiveModel } from '../utils/settings.js';
  * @param {number} maxTokens - Max output tokens
  * @returns {Promise<{text: string, inputTokens: number, outputTokens: number}>}
  */
-export async function callAnthropic(prompt, systemPrompt, apiKey, maxTokens = 8000) {
+export async function callAnthropic(prompt, systemPrompt, apiKey, maxTokens = 8000, onRetry) {
   const config = MODEL_CONFIG.anthropic;
   const activeModelId = getActiveModel('anthropic');
   
@@ -28,7 +28,7 @@ export async function callAnthropic(prompt, systemPrompt, apiKey, maxTokens = 80
       system: systemPrompt,
       messages: [{ role: 'user', content: prompt }]
     })
-  });
+  }, { onRetry });
 
   const data = await response.json();
   if (data.error) throw new Error(data.error.message);

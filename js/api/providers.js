@@ -13,13 +13,13 @@ import { getActiveModel } from '../utils/settings.js';
  * @param {number} [options.maxTokens]
  * @returns {Promise<{text: string, inputTokens: number, outputTokens: number}>}
  */
-export async function callLLM({ prompt, systemPrompt, apiKey, provider, maxTokens }) {
+export async function callLLM({ prompt, systemPrompt, apiKey, provider, maxTokens, onRetry }) {
   // Let the underlying providers handle dynamic models
   switch (provider) {
     case PROVIDERS.ANTHROPIC:
-      return callAnthropic(prompt, systemPrompt, apiKey, maxTokens);
+      return callAnthropic(prompt, systemPrompt, apiKey, maxTokens, onRetry);
     case PROVIDERS.GEMINI:
-      return callGemini(prompt, systemPrompt, apiKey, maxTokens);
+      return callGemini(prompt, systemPrompt, apiKey, maxTokens, onRetry);
     default:
       throw new Error(`Provider desconocido: ${provider}`);
   }

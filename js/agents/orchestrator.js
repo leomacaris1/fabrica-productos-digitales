@@ -75,11 +75,17 @@ export async function runWorkflow({ niche, apiKey, provider, sessionId, language
    * Generate content for a step with continuation + QA
    */
   async function generateStep(stepId, prompt, contextStr, subLabel) {
+    const onRetry = (attempt, delay, error) => {
+      const sec = (delay / 1000).toFixed(0);
+      callbacks.onRetry?.(stepId, attempt, delay, error);
+      callbacks.onLog?.(`Paso ${stepId} — API saturada o error de red. Intento ${attempt} en ${sec}s...`, 'error');
+    };
+
     // 1. Writer generates
     callbacks.onStepStart?.(stepId, subLabel || 'Writer generando...');
     callbacks.onLog?.(`Paso ${stepId}${subLabel ? ' [' + subLabel + ']' : ''} — Writer Agent (${language})`, 'writer');
 
-    const writerResult = await writerGenerate({ prompt, apiKey, provider, language });
+    const writerResult = await writerGenerate({ prompt, apiKey, provider, language, onRetry });
     trackTokens(writerResult);
     let content = writerResult.text;
 
@@ -93,7 +99,8 @@ export async function runWorkflow({ niche, apiKey, provider, sessionId, language
         totalContinuations++;
         callbacks.onStepContinuation?.(stepId, pass);
         callbacks.onLog?.(`Paso ${stepId} — Truncado → Continuation Agent (${pass})`, 'continuation');
-      }
+      },
+      onRetry
     });
     if (contResult.passes > 0) {
       content = contResult.text;
@@ -109,7 +116,7 @@ export async function runWorkflow({ niche, apiKey, provider, sessionId, language
     // 3. QA review
     callbacks.onStepQA?.(stepId);
     callbacks.onLog?.(`Paso ${stepId} — QA Agent revisando (${language})`, 'qa');
-    const qaResult = await qaReview({ content, contextStr, apiKey, provider, language });
+    const qaResult = await qaReview({ content, contextStr, apiKey, provider, language, onRetry });
     trackTokens(qaResult);
     if (qaResult.wasFixed) {
       totalQAFixes++;

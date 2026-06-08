@@ -14,7 +14,7 @@ import { getEffectiveSystemPrompt } from '../utils/settings.js';
  * @param {function} [options.onContinuation] - Callback for each continuation pass
  * @returns {Promise<{text: string, totalInputTokens: number, totalOutputTokens: number, passes: number}>}
  */
-export async function continueIfNeeded({ content, apiKey, provider, language = 'es-latam', maxPasses = 3, onContinuation }) {
+export async function continueIfNeeded({ content, apiKey, provider, language = 'es-latam', maxPasses = 3, onContinuation, onRetry }) {
   let result = content;
   let passes = 0;
   let totalInputTokens = 0;
@@ -36,6 +36,7 @@ Continúa aquí:`,
       apiKey,
       provider,
       maxTokens: 6000,
+      onRetry,
     });
 
     result = result.trimEnd() + '\n' + response.text;

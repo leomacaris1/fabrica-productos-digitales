@@ -10,7 +10,7 @@ import { getActiveModel } from '../utils/settings.js';
  * @param {number} maxTokens - Max output tokens
  * @returns {Promise<{text: string, inputTokens: number, outputTokens: number}>}
  */
-export async function callGemini(prompt, systemPrompt, apiKey, maxTokens = 8192) {
+export async function callGemini(prompt, systemPrompt, apiKey, maxTokens = 8192, onRetry) {
   const config = MODEL_CONFIG.gemini;
   const activeModelId = getActiveModel('gemini');
   const url = `${config.endpoint}/${activeModelId}:generateContent?key=${apiKey}`;
@@ -27,7 +27,7 @@ export async function callGemini(prompt, systemPrompt, apiKey, maxTokens = 8192)
         topP: 0.9,
       }
     })
-  });
+  }, { onRetry });
 
   const data = await response.json();
   if (data.error) throw new Error(data.error.message || 'Gemini API error');

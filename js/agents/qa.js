@@ -10,9 +10,10 @@ import { getEffectiveQAPrompt } from '../utils/settings.js';
  * @param {string} options.apiKey
  * @param {string} options.provider
  * @param {string} [options.language='es-latam']
+ * @param {Function} [options.onRetry]
  * @returns {Promise<{text: string, inputTokens: number, outputTokens: number, wasFixed: boolean}>}
  */
-export async function qaReview({ content, contextStr, apiKey, provider, language = 'es-latam' }) {
+export async function qaReview({ content, contextStr, apiKey, provider, language = 'es-latam', onRetry }) {
   const prompt = `Contexto del producto: ${contextStr}
 
 Revisa el siguiente contenido. Detecta si hay:
@@ -36,6 +37,7 @@ ${content}
     apiKey,
     provider,
     maxTokens: 8000,
+    onRetry,
   });
 
   // Heuristic: if QA response is significantly different in length, content was fixed

@@ -12,12 +12,13 @@ import { getEffectiveSystemPrompt } from '../utils/settings.js';
  * @param {number} [options.maxTokens]
  * @returns {Promise<{text: string, inputTokens: number, outputTokens: number}>}
  */
-export async function writerGenerate({ prompt, apiKey, provider, language = 'es-latam', maxTokens }) {
+export async function writerGenerate({ prompt, apiKey, provider, language = 'es-latam', maxTokens, onRetry }) {
   return callLLM({
     prompt,
     systemPrompt: getEffectiveSystemPrompt(language, SYSTEM_PROMPTS),
     apiKey,
     provider,
     maxTokens,
+    onRetry,
   });
 }
