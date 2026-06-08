@@ -5,6 +5,7 @@ import { continueIfNeeded } from './continuation.js';
 import { validateStep, cleanAgentOutput } from '../utils/validation.js';
 import { calculateCost } from '../api/providers.js';
 import { saveSession } from '../utils/session.js';
+import { loadSettings } from '../utils/settings.js';
 
 // Import all prompt builders
 import { buildPrompt as prompt01 } from '../prompts/paso-01-ideas.js';
@@ -51,8 +52,17 @@ export async function runWorkflow({ niche, apiKey, provider, sessionId, language
   const ctx = { niche };
   let totalIn = 0, totalOut = 0, totalCalls = 0, totalContinuations = 0, totalQAFixes = 0;
 
+  const settings = loadSettings();
+  const maxBudget = settings.maxBudget || 1.00;
+
   const updateStats = () => {
     const cost = calculateCost(provider, totalIn, totalOut);
+    
+    // Verificación de Presupuesto Máximo
+    if (cost > maxBudget && provider !== 'dry-run') {
+       throw new Error(`PRESUPUESTO SUPERADO: El costo estimado ($${cost.toFixed(4)}) excede tu límite de $${maxBudget.toFixed(2)}. Ejecución detenida para evitar cargos extra.`);
+    }
+
     callbacks.onStats?.({
       inputTokens: totalIn,
       outputTokens: totalOut,
@@ -171,10 +181,14 @@ export async function runWorkflow({ niche, apiKey, provider, sessionId, language
     // PASO 4 — Content (module by module)
     callbacks.onProgress?.(4, 10);
     let allModules = '';
+    
+    // Optimización de Context Window (Solo enviamos los títulos de los módulos como contexto en lugar del esquema entero de forma desestructurada)
+    const contextS3 = s3.substring(0, 1500) + "..."; // Recorte seguro
+    
     for (let mod = 1; mod <= 5; mod++) {
       const { content: modText } = await generateStep(
         4, prompt04(ctx, mod),
-        `Módulo ${mod}/5. Producto: ${ctx.productName}`,
+        `Módulo ${mod}/5. Producto: ${ctx.productName}. Esquema base: ${contextS3}`,
         `módulo ${mod}/5`
       );
       allModules += `\n\n---\n\n${modText}`;

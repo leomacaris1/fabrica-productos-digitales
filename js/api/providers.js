@@ -45,27 +45,32 @@ export async function callLLM({ prompt, systemPrompt, apiKey, provider, maxToken
         try {
           result = await callOpenRouter(prompt, systemPrompt, orKey, maxTokens, onRetry);
         } catch (error) {
-          // Fallback Automático para OpenRouter (Modelos gratuitos)
-          console.warn(`[Fallback] Error con el modelo principal de OpenRouter: ${error.message}. Intentando con Qwen 2.5 7B gratuito...`);
-          if (onRetry) onRetry('fallback', 1, 0, error); // Notify UI loosely
-          
-          // Cambiamos temporalmente el activeModelId para la caché si tiene éxito
-          const fallbackModel = 'qwen/qwen-2.5-7b-instruct:free';
-          const originalGetActiveModel = settings.model.openrouter;
-          settings.model.openrouter = fallbackModel;
+          // Fallback Automático para OpenRouter
+          console.warn(`[Fallback] Error con el modelo principal de OpenRouter: ${error.message}. Intentando fallback...`);
+          if (onRetry) onRetry('fallback', 1, 0, error);
           
           try {
-            result = await callOpenRouter(prompt, systemPrompt, orKey, maxTokens, null); // Sin onRetry interno para el fallback inmediato
+            console.warn(`[Fallback] Intentando con Qwen 2.5 7B gratuito...`);
+            settings.model.openrouter = 'qwen/qwen-2.5-7b-instruct:free';
+            result = await callOpenRouter(prompt, systemPrompt, orKey, maxTokens, null);
           } catch (fallbackError) {
-             console.warn(`[Fallback] Qwen también falló: ${fallbackError.message}. Intentando Gemma 2 9B gratuito...`);
-             settings.model.openrouter = 'google/gemma-2-9b-it:free';
-             result = await callOpenRouter(prompt, systemPrompt, orKey, maxTokens, null);
+             console.warn(`[Fallback] Qwen falló: ${fallbackError.message}. Intentando Gemini como fallback de emergencia...`);
+             result = await callGemini(prompt, systemPrompt, apiKey, maxTokens, null);
           }
         }
         break;
       }
       case PROVIDERS.OLLAMA:
         result = await callOllama(prompt, systemPrompt, apiKey, maxTokens, onRetry);
+        break;
+      case 'dry-run':
+        // Simulación instantánea que no gasta tokens
+        await new Promise(r => setTimeout(r, 500));
+        result = {
+          text: `[DRY RUN SIMULADO]\nPrompt original: ${prompt.substring(0, 100)}...`,
+          inputTokens: 0,
+          outputTokens: 0
+        };
         break;
       default:
         throw new Error(`Provider desconocido: ${provider}`);

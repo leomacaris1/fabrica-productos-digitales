@@ -440,6 +440,7 @@ function initSettingsUI() {
         gemini: $('settingModelGemini')?.value
       },
       tone: activeToneBtn?.dataset.tone || 'profesional',
+      maxBudget: parseFloat($('settingMaxBudget')?.value) || 1.00,
       customSystemPrompt: {
         'es-latam': $('settingPromptLatam')?.value || null,
         'en-us': $('settingPromptUs')?.value || null
@@ -468,8 +469,9 @@ function loadSettingsToUI() {
   if ($('settingOpenrouterKey')) $('settingOpenrouterKey').value = s.openrouterApiKey || '';
   if ($('settingOllamaEndpoint')) $('settingOllamaEndpoint').value = s.ollamaEndpoint || 'http://localhost:11434';
 
-  // Cache toggle
+  // Cache toggle & Budget
   if ($('settingCacheEnabled')) $('settingCacheEnabled').checked = s.cacheEnabled === true;
+  if ($('settingMaxBudget')) $('settingMaxBudget').value = s.maxBudget || 1.00;
 
   // Tone
   const toneButtons = document.querySelectorAll('#settingToneSelect .provider-option');

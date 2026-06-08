@@ -20,6 +20,9 @@ const DEFAULTS = {
   // Prompt cache
   cacheEnabled: false,
 
+  // Budget
+  maxBudget: 1.00,
+
   // Tone
   tone: 'profesional', // profesional | casual | emocional | directo
 

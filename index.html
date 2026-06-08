@@ -88,6 +88,7 @@
                     <button class="provider-option" data-provider="gemini">Gemini</button>
                     <button class="provider-option" data-provider="openrouter">OpenRouter</button>
                     <button class="provider-option" data-provider="ollama">Ollama 🏠</button>
+                    <button class="provider-option" data-provider="dry-run" title="Modo de simulación">Dry Run 🧪</button>
                   </div>
                 </div>
                 <input type="password" id="apiKey" class="input" placeholder="sk-ant-api03-... o AIza..." autocomplete="off" />
@@ -312,20 +313,26 @@
           </div>
         </div>
 
-        <!-- Section: Cache -->
+        <!-- Section: Cache & Presupuesto -->
         <div class="card u-mb-20">
           <div class="card-header u-flex u-align-center u-gap-8">
             <span>⚡</span>
-            <h2 class="u-fs-14 u-m-0">Caché de Prompts</h2>
+            <h2 class="u-fs-14 u-m-0">Control de Gastos & Caché</h2>
           </div>
           <div class="card-body">
-            <p class="u-fs-12 u-color-secondary u-mb-16">Al activar la caché, las respuestas idénticas se guardan en memoria de la sesión. Útil para re-ejecutar pasos sin consumir tokens (ideal durante desarrollo y pruebas).</p>
-            <div class="u-flex u-align-center u-gap-12">
-              <label class="toggle-label">
-                <input type="checkbox" id="settingCacheEnabled" />
-                <span class="toggle-track"></span>
-                <span class="u-fs-12 u-color-secondary">Activar Caché de Sesión</span>
-              </label>
+            <p class="u-fs-12 u-color-secondary u-mb-16">Evita sustos en tu facturación estableciendo un límite y activa la caché para no gastar tokens al repetir pasos.</p>
+            <div class="u-flex u-gap-20 u-flex-wrap u-align-center">
+              <div class="u-flex-1">
+                <label class="toggle-label">
+                  <input type="checkbox" id="settingCacheEnabled" />
+                  <span class="toggle-track"></span>
+                  <span class="u-fs-12 u-color-secondary">Activar Caché de Sesión</span>
+                </label>
+              </div>
+              <div class="u-flex-1">
+                <label class="api-label">Presupuesto Máximo (USD)</label>
+                <input type="number" id="settingMaxBudget" class="input" step="0.25" min="0" placeholder="1.00" />
+              </div>
             </div>
           </div>
         </div>
